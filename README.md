@@ -1,83 +1,139 @@
--- NatHub | Dead Rails (0.3.1)
--- Feito para Android | Com teleportes, botões X e - funcionais, e menu ocultável
-
+-- NatHub | Dead Rails (0.3.1) com abas e funções adicionais
 local player = game.Players.LocalPlayer
-local mouse = player:GetMouse()
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 
--- Criar GUI principal
-local screenGui = Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "NatHub_GUI"
-screenGui.ResetOnSpawn = false
+-- Criar Janela Principal
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 300, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = true
+mainFrame.Name = "NatHub"
 
-local frame = Instance.new("Frame", screenGui)
-frame.Name = "MainFrame"
-frame.Size = UDim2.new(0, 300, 0, 200)
-frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
-
-local title = Instance.new("TextLabel", frame)
+-- Título
+local title = Instance.new("TextLabel", mainFrame)
 title.Size = UDim2.new(1, 0, 0, 25)
-title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
 title.Text = "NatHub | Dead Rails (0.3.1)"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 16
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextScaled = true
 
-title.Name = "TitleBar"
-
-local closeBtn = Instance.new("TextButton", frame)
-closeBtn.Text = "X"
-closeBtn.Size = UDim2.new(0, 25, 0, 25)
-closeBtn.Position = UDim2.new(1, -25, 0, 0)
-closeBtn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
-closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeBtn.Font = Enum.Font.SourceSansBold
-closeBtn.TextSize = 16
-
-closeBtn.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
+-- Botão de fechar
+local closeButton = Instance.new("TextButton", mainFrame)
+closeButton.Size = UDim2.new(0, 25, 0, 25)
+closeButton.Position = UDim2.new(1, -25, 0, 0)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.new(0.2, 0, 0)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.MouseButton1Click:Connect(function()
+    gui:Destroy()
 end)
 
-local minimizeBtn = Instance.new("TextButton", frame)
-minimizeBtn.Text = "-"
-minimizeBtn.Size = UDim2.new(0, 25, 0, 25)
-minimizeBtn.Position = UDim2.new(1, -50, 0, 0)
-minimizeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 0)
-minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeBtn.Font = Enum.Font.SourceSansBold
-minimizeBtn.TextSize = 16
+-- Botão de ocultar
+local minimizeButton = Instance.new("TextButton", mainFrame)
+minimizeButton.Size = UDim2.new(0, 25, 0, 25)
+minimizeButton.Position = UDim2.new(1, -50, 0, 0)
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0)
+minimizeButton.TextColor3 = Color3.new(1, 1, 1)
 
-local isMinimized = false
-minimizeBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    for _, obj in pairs(frame:GetChildren()) do
-        if obj ~= title and obj ~= closeBtn and obj ~= minimizeBtn then
-            obj.Visible = not isMinimized
+local contentVisible = true
+
+minimizeButton.MouseButton1Click:Connect(function()
+    contentVisible = not contentVisible
+    for _, child in pairs(mainFrame:GetChildren()) do
+        if child ~= title and child ~= closeButton and child ~= minimizeButton then
+            child.Visible = contentVisible
         end
     end
 end)
 
--- Botão de Teleporte
-local tpBtn = Instance.new("TextButton", frame)
-tpBtn.Size = UDim2.new(1, -20, 0, 30)
-tpBtn.Position = UDim2.new(0, 10, 0, 40)
-tpBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-tpBtn.Text = "Teleport: Base"
-tpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-tpBtn.Font = Enum.Font.SourceSansBold
-tpBtn.TextSize = 14
+-- Abas
+local tabs = {
+    "Main",
+    "Character",
+    "Teleport",
+    "Visual",
+    "Combat",
+    "Configuration"
+}
 
-tpBtn.MouseButton1Click:Connect(function()
-    local char = player.Character
+local selectedTab = "Main"
+
+-- Criar Abas
+local tabButtons = {}
+for i, tabName in ipairs(tabs) do
+    local tab = Instance.new("TextButton", mainFrame)
+    tab.Size = UDim2.new(0, 100, 0, 25)
+    tab.Position = UDim2.new(0, (i - 1) * 100, 0, 30)
+    tab.Text = tabName
+    tab.TextColor3 = Color3.new(1, 1, 1)
+    tab.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    tab.MouseButton1Click:Connect(function()
+        selectedTab = tabName
+        for _, v in pairs(mainFrame:GetChildren()) do
+            if v:IsA("Frame") and v.Name ~= "NatHub" then
+                v.Visible = false
+            end
+        end
+        if mainFrame:FindFirstChild(tabName) then
+            mainFrame[tabName].Visible = true
+        end
+    end)
+    table.insert(tabButtons, tab)
+end
+
+-- Criar Conteúdo de cada aba
+local function createTabContent(name)
+    local frame = Instance.new("Frame", mainFrame)
+    frame.Name = name
+    frame.Size = UDim2.new(1, -10, 1, -65)
+    frame.Position = UDim2.new(0, 5, 0, 60)
+    frame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    frame.Visible = name == "Main"
+    return frame
+end
+
+local mainTab = createTabContent("Main")
+local charTab = createTabContent("Character")
+local teleportTab = createTabContent("Teleport")
+local visualTab = createTabContent("Visual")
+local combatTab = createTabContent("Combat")
+local configTab = createTabContent("Configuration")
+
+-- Funções para Teleporte
+local teleportBtn = Instance.new("TextButton", teleportTab)
+teleportBtn.Size = UDim2.new(0.8, 0, 0, 30)
+teleportBtn.Position = UDim2.new(0.1, 0, 0, 10)
+teleportBtn.Text = "Teleport: Base"
+teleportBtn.TextColor3 = Color3.new(1, 1, 1)
+teleportBtn.BackgroundColor3 = Color3.new(0.2, 0.2, 0.4)
+teleportBtn.MouseButton1Click:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait()
     if char and char:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(132, 15, -65)) -- coordenadas da base
+        char:MoveTo(Vector3.new(0, 10, 0)) -- Posição exemplo da base
     end
 end)
 
--- Adicione mais botões aqui, como "Auto Win", "Coletar Ouro", etc.
--- Me avise se quiser que eu continue com eles!
+-- Placeholder para outras funções
+local function addPlaceholderButton(tab, text, ypos)
+    local btn = Instance.new("TextButton", tab)
+    btn.Size = UDim2.new(0.8, 0, 0, 30)
+    btn.Position = UDim2.new(0.1, 0, 0, ypos)
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    return btn
+end
 
--- Interface totalmente funcional no Android.
+addPlaceholderButton(mainTab, "Auto Win (Em breve)", 10)
+addPlaceholderButton(mainTab, "Coletar Ouro (Em breve)", 50)
+addPlaceholderButton(charTab, "Aumentar Velocidade (Em breve)", 10)
+addPlaceholderButton(combatTab, "Ataque Rápido (Em breve)", 10)
+addPlaceholderButton(visualTab, "Tema Escuro (Ativo)", 10)
+addPlaceholderButton(configTab, "Reiniciar GUI", 10).MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- Pronto para adicionar mais funções reais!
