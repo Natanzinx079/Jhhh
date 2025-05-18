@@ -152,6 +152,70 @@ createInputBox(LocalPlayer.Character.Humanoid.JumpPower, 120, function(val)
     LocalPlayer.Character.Humanoid.JumpPower = val
 end)
 
+-- Conteúdo do Main
+local mainTab = tabFrames["Main"]
+local runService = game:GetService("RunService")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Botão de toggle utilitário
+local function createMainToggle(name, posY, callback)
+    local btn = Instance.new("TextButton")
+    btn.Text = name .. ": OFF"
+    btn.Size = UDim2.new(0, 200, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.BackgroundColor3 = highlightColor
+    btn.TextColor3 = textColor
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Parent = mainTab
+
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 6)
+
+    local enabled = false
+    btn.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        btn.Text = name .. ": " .. (enabled and "ON" or "OFF")
+        callback(enabled)
+    end)
+end
+
+-- Auto Bond (coleta automática de Bond ao pegar passageiro)
+local autoBondRunning = false
+createMainToggle("Auto Bond", 20, function(state)
+    autoBondRunning = state
+    if state then
+        task.spawn(function()
+            while autoBondRunning do
+                for _, obj in ipairs(workspace:GetDescendants()) do
+                    if obj:IsA("ProximityPrompt") and obj.ObjectText and string.lower(obj.ObjectText) == "passageiro" then
+                        fireproximityprompt(obj)
+                    end
+                end
+                task.wait(1)
+            end
+        end)
+    end
+end)
+
+-- Auto Win (teleporta até o final do trilho automaticamente)
+local autoWinRunning = false
+createMainToggle("Auto Win", 60, function(state)
+    autoWinRunning = state
+    if state then
+        task.spawn(function()
+            while autoWinRunning do
+                local trainEnd = workspace:FindFirstChild("End") or workspace:FindFirstChild("EndZone")
+                local character = Players.LocalPlayer.Character
+                if trainEnd and character and character:FindFirstChild("HumanoidRootPart") then
+                    character:MoveTo(trainEnd.Position + Vector3.new(0, 5, 0))
+                end
+                task.wait(2)
+            end
+        end)
+    end
+end)
+
 -- Botão flutuante
 local floatBtn = Instance.new("TextButton")
 floatBtn.Parent = gui
