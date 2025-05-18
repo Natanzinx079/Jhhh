@@ -1,6 +1,5 @@
--- NatanHub com visual aprimorado (ícones + animação de abas)
+-- NatanHub com visual aprimorado (sem alterar funcionalidades)
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
@@ -10,17 +9,19 @@ gui.Parent = game.CoreGui
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 
+-- Cores
 local darkColor = Color3.fromRGB(20, 20, 20)
 local accentColor = Color3.fromRGB(0, 170, 255)
 local textColor = Color3.fromRGB(255, 255, 255)
 
-local iconList = {
-    Main = "rbxassetid://7733960981", -- Exemplo de ícone (home)
-    Character = "rbxassetid://7734026636", -- Boneco
-    Teleport = "rbxassetid://7734075736", -- Ponteiro
-    Visual = "rbxassetid://7734068321", -- Olho
-    Combat = "rbxassetid://7734032644", -- Espada
-    Configuration = "rbxassetid://7733911829" -- Engrenagem
+-- Ícones das abas
+local tabIcons = {
+    Main = "🏠",
+    Character = "🧍",
+    Teleport = "🗺️",
+    Visual = "⭐",
+    Combat = "⚔️",
+    Configuration = "⚙️"
 }
 
 -- Main Frame
@@ -30,10 +31,9 @@ mainFrame.Size = UDim2.new(0, 500, 0, 300)
 mainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
 mainFrame.BackgroundColor3 = darkColor
 mainFrame.BorderSizePixel = 0
-mainFrame.Parent = gui
-mainFrame.Visible = true
 mainFrame.Active = true
 mainFrame.Draggable = true
+mainFrame.Parent = gui
 
 -- Title Bar
 local titleBar = Instance.new("TextLabel")
@@ -53,7 +53,7 @@ sideMenu.Position = UDim2.new(0, 0, 0, 30)
 sideMenu.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 sideMenu.Parent = mainFrame
 
--- Tabs
+-- Abas
 local tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Configuration"}
 local tabFrames = {}
 local activeTab
@@ -62,23 +62,15 @@ for i, tabName in ipairs(tabs) do
     local tabBtn = Instance.new("TextButton")
     tabBtn.Size = UDim2.new(1, 0, 0, 35)
     tabBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 35)
+    tabBtn.Text = tabIcons[tabName] .. "  " .. tabName
     tabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    tabBtn.Text = "  " .. tabName
     tabBtn.TextColor3 = textColor
     tabBtn.Font = Enum.Font.SourceSansBold
     tabBtn.TextSize = 14
     tabBtn.TextXAlignment = Enum.TextXAlignment.Left
+    tabBtn.PaddingLeft = UDim.new(0, 10)
     tabBtn.Parent = sideMenu
 
-    -- Icon
-    local icon = Instance.new("ImageLabel")
-    icon.Image = iconList[tabName] or ""
-    icon.Size = UDim2.new(0, 20, 0, 20)
-    icon.Position = UDim2.new(0, 5, 0.5, -10)
-    icon.BackgroundTransparency = 1
-    icon.Parent = tabBtn
-
-    -- Tab Content Frame
     local tabFrame = Instance.new("Frame")
     tabFrame.Name = tabName .. "Frame"
     tabFrame.Size = UDim2.new(1, -130, 1, -30)
@@ -90,23 +82,60 @@ for i, tabName in ipairs(tabs) do
     tabFrames[tabName] = tabFrame
 
     tabBtn.MouseButton1Click:Connect(function()
-        if activeTab and activeTab ~= tabFrame then
-            local fadeOut = TweenService:Create(activeTab, TweenInfo.new(0.2), {BackgroundTransparency = 1})
-            fadeOut:Play()
-            fadeOut.Completed:Wait()
+        if activeTab then
             activeTab.Visible = false
-            activeTab.BackgroundTransparency = 0
         end
-
         tabFrame.Visible = true
-        tabFrame.BackgroundTransparency = 1
-        local fadeIn = TweenService:Create(tabFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0})
-        fadeIn:Play()
         activeTab = tabFrame
     end)
 end
 
--- Floating Button
+-- Aba Character
+local charTab = tabFrames["Character"]
+
+local function createLabel(text, posY)
+    local lbl = Instance.new("TextLabel")
+    lbl.Text = text
+    lbl.Position = UDim2.new(0, 10, 0, posY)
+    lbl.Size = UDim2.new(0, 200, 0, 25)
+    lbl.BackgroundTransparency = 1
+    lbl.TextColor3 = textColor
+    lbl.Font = Enum.Font.SourceSans
+    lbl.TextSize = 14
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = charTab
+    return lbl
+end
+
+local function createInputBox(default, posY, callback)
+    local box = Instance.new("TextBox")
+    box.Text = tostring(default)
+    box.Size = UDim2.new(0, 100, 0, 30)
+    box.Position = UDim2.new(0, 10, 0, posY)
+    box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    box.TextColor3 = textColor
+    box.Font = Enum.Font.SourceSans
+    box.TextSize = 14
+    box.ClearTextOnFocus = false
+    box.Parent = charTab
+    box.FocusLost:Connect(function()
+        local val = tonumber(box.Text)
+        if val then pcall(function() callback(val) end) end
+    end)
+    return box
+end
+
+createLabel("Walk Speed", 20)
+createInputBox(LocalPlayer.Character.Humanoid.WalkSpeed, 50, function(val)
+    LocalPlayer.Character.Humanoid.WalkSpeed = val
+end)
+
+createLabel("Jump Power", 90)
+createInputBox(LocalPlayer.Character.Humanoid.JumpPower, 120, function(val)
+    LocalPlayer.Character.Humanoid.JumpPower = val
+end)
+
+-- Floating button
 local floatBtn = Instance.new("TextButton")
 floatBtn.Parent = gui
 floatBtn.Text = "NatHub"
@@ -120,7 +149,7 @@ floatBtn.Visible = false
 floatBtn.Active = true
 floatBtn.Draggable = true
 
--- Close / Minimize
+-- Botões de minimizar e fechar
 local closeBtn = Instance.new("TextButton")
 closeBtn.Parent = mainFrame
 closeBtn.Text = "X"
@@ -155,7 +184,6 @@ floatBtn.MouseButton1Click:Connect(function()
     floatBtn.Visible = false
 end)
 
--- Ativar a aba "Character" como padrão
-wait()
+-- Abrir aba Character como padrão
 tabFrames["Character"].Visible = true
 activeTab = tabFrames["Character"]
