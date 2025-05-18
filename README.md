@@ -1,7 +1,7 @@
 -- NatanHub com visual aprimorado (sem alterar funções)
-local Players = game:GetService("Players")
+local Players = game\:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded\:Wait()
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "NatanHub"
@@ -9,13 +9,13 @@ gui.Parent = game.CoreGui
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 
--- Cores
+\-- Cores
 local darkColor = Color3.fromRGB(25, 25, 25)
 local accentColor = Color3.fromRGB(0, 170, 255)
 local textColor = Color3.fromRGB(255, 255, 255)
 local highlightColor = Color3.fromRGB(35, 35, 35)
 
--- Main Frame
+\-- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 520, 0, 320)
@@ -28,22 +28,22 @@ mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.ClipsDescendants = true
 mainFrame.BackgroundTransparency = 0
-mainFrame:SetAttribute("Rounded", true)
+mainFrame\:SetAttribute("Rounded", true)
 
--- Arredondamento
+\-- Arredondamento
 local UICornerMain = Instance.new("UICorner", mainFrame)
 UICornerMain.CornerRadius = UDim.new(0, 10)
 
--- Sombra
+\-- Sombra
 local shadow = Instance.new("ImageLabel", mainFrame)
-shadow.Image = "rbxassetid://1316045217"
-shadow.ImageTransparency = 0.5
-shadow.Size = UDim2.new(1, 30, 1, 30)
-shadow.Position = UDim2.new(0, -15, 0, -15)
-shadow.BackgroundTransparency = 1
-shadow.ZIndex = 0
+shadow\.Image = "rbxassetid://1316045217"
+shadow\.ImageTransparency = 0.5
+shadow\.Size = UDim2.new(1, 30, 1, 30)
+shadow\.Position = UDim2.new(0, -15, 0, -15)
+shadow\.BackgroundTransparency = 1
+shadow\.ZIndex = 0
 
--- Title Bar
+\-- Title Bar
 local titleBar = Instance.new("TextLabel")
 titleBar.Parent = mainFrame
 titleBar.Size = UDim2.new(1, 0, 0, 32)
@@ -57,7 +57,7 @@ titleBar.BorderSizePixel = 0
 local UICornerTitle = Instance.new("UICorner", titleBar)
 UICornerTitle.CornerRadius = UDim.new(0, 6)
 
--- Side Menu
+\-- Side Menu
 local sideMenu = Instance.new("Frame")
 sideMenu.Name = "SideMenu"
 sideMenu.Size = UDim2.new(0, 130, 1, -32)
@@ -68,91 +68,97 @@ sideMenu.Parent = mainFrame
 local UICornerSide = Instance.new("UICorner", sideMenu)
 UICornerSide.CornerRadius = UDim.new(0, 6)
 
--- Tabs
+\-- Tabs
 local tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Configuration"}
 local tabFrames = {}
 local activeTab
 
 for i, tabName in ipairs(tabs) do
-    local tabBtn = Instance.new("TextButton")
-    tabBtn.Size = UDim2.new(1, 0, 0, 35)
-    tabBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 35)
-    tabBtn.Text = tabName
-    tabBtn.BackgroundColor3 = darkColor
-    tabBtn.TextColor3 = textColor
-    tabBtn.Font = Enum.Font.Gotham
-    tabBtn.TextSize = 14
-    tabBtn.Parent = sideMenu
+local tabBtn = Instance.new("TextButton")
+tabBtn.Size = UDim2.new(1, 0, 0, 35)
+tabBtn.Position = UDim2.new(0, 0, 0, (i - 1) \* 35)
+tabBtn.Text = tabName
+tabBtn.BackgroundColor3 = darkColor
+tabBtn.TextColor3 = textColor
+tabBtn.Font = Enum.Font.Gotham
+tabBtn.TextSize = 14
+tabBtn.Parent = sideMenu
 
-    local UICornerBtn = Instance.new("UICorner", tabBtn)
-    UICornerBtn.CornerRadius = UDim.new(0, 6)
+```
+local UICornerBtn = Instance.new("UICorner", tabBtn)
+UICornerBtn.CornerRadius = UDim.new(0, 6)
 
-    local tabFrame = Instance.new("Frame")
-    tabFrame.Name = tabName .. "Frame"
-    tabFrame.Size = UDim2.new(1, -130, 1, -32)
-    tabFrame.Position = UDim2.new(0, 130, 0, 32)
-    tabFrame.BackgroundColor3 = darkColor
-    tabFrame.Visible = false
-    tabFrame.Parent = mainFrame
+local tabFrame = Instance.new("Frame")
+tabFrame.Name = tabName .. "Frame"
+tabFrame.Size = UDim2.new(1, -130, 1, -32)
+tabFrame.Position = UDim2.new(0, 130, 0, 32)
+tabFrame.BackgroundColor3 = darkColor
+tabFrame.Visible = false
+tabFrame.Parent = mainFrame
 
-    tabFrames[tabName] = tabFrame
+tabFrames[tabName] = tabFrame
 
-    tabBtn.MouseButton1Click:Connect(function()
-        if activeTab then activeTab.Visible = false end
-        tabFrame.Visible = true
-        activeTab = tabFrame
-    end)
+tabBtn.MouseButton1Click:Connect(function()
+    if activeTab then activeTab.Visible = false end
+    tabFrame.Visible = true
+    activeTab = tabFrame
+end)
+```
+
 end
 
--- Conteúdo do Character
-local charTab = tabFrames["Character"]
+\-- Conteúdo do Character
+local charTab = tabFrames\["Character"]
 
 local function createLabel(text, posY)
-    local label = Instance.new("TextLabel")
-    label.Text = text
-    label.Position = UDim2.new(0, 10, 0, posY)
-    label.Size = UDim2.new(0, 200, 0, 25)
-    label.BackgroundTransparency = 1
-    label.TextColor3 = textColor
-    label.Font = Enum.Font.Gotham
-    label.TextSize = 14
-    label.Parent = charTab
-    return label
+local label = Instance.new("TextLabel")
+label.Text = text
+label.Position = UDim2.new(0, 10, 0, posY)
+label.Size = UDim2.new(0, 200, 0, 25)
+label.BackgroundTransparency = 1
+label.TextColor3 = textColor
+label.Font = Enum.Font.Gotham
+label.TextSize = 14
+label.Parent = charTab
+return label
 end
 
 local function createInputBox(value, posY, callback)
-    local box = Instance.new("TextBox")
-    box.Text = tostring(value)
-    box.Size = UDim2.new(0, 100, 0, 30)
-    box.Position = UDim2.new(0, 10, 0, posY)
-    box.BackgroundColor3 = highlightColor
-    box.TextColor3 = textColor
-    box.Font = Enum.Font.Gotham
-    box.TextSize = 14
-    box.Parent = charTab
+local box = Instance.new("TextBox")
+box.Text = tostring(value)
+box.Size = UDim2.new(0, 100, 0, 30)
+box.Position = UDim2.new(0, 10, 0, posY)
+box.BackgroundColor3 = highlightColor
+box.TextColor3 = textColor
+box.Font = Enum.Font.Gotham
+box.TextSize = 14
+box.Parent = charTab
 
-    local corner = Instance.new("UICorner", box)
-    corner.CornerRadius = UDim.new(0, 6)
+```
+local corner = Instance.new("UICorner", box)
+corner.CornerRadius = UDim.new(0, 6)
 
-    box.FocusLost:Connect(function()
-        local val = tonumber(box.Text)
-        if val then pcall(callback, val) end
-    end)
+box.FocusLost:Connect(function()
+    local val = tonumber(box.Text)
+    if val then pcall(callback, val) end
+end)
 
-    return box
+return box
+```
+
 end
 
 createLabel("Walk Speed", 20)
 createInputBox(LocalPlayer.Character.Humanoid.WalkSpeed, 50, function(val)
-    LocalPlayer.Character.Humanoid.WalkSpeed = val
+LocalPlayer.Character.Humanoid.WalkSpeed = val
 end)
 
 createLabel("Jump Power", 90)
 createInputBox(LocalPlayer.Character.Humanoid.JumpPower, 120, function(val)
-    LocalPlayer.Character.Humanoid.JumpPower = val
+LocalPlayer.Character.Humanoid.JumpPower = val
 end)
 
--- Botão flutuante
+\-- Botão flutuante
 local floatBtn = Instance.new("TextButton")
 floatBtn.Parent = gui
 floatBtn.Text = "NatHub"
@@ -169,7 +175,7 @@ floatBtn.Draggable = true
 local floatCorner = Instance.new("UICorner", floatBtn)
 floatCorner.CornerRadius = UDim.new(0, 8)
 
--- Fechar & Minimizar
+\-- Fechar & Minimizar
 local closeBtn = Instance.new("TextButton")
 closeBtn.Parent = mainFrame
 closeBtn.Text = "X"
@@ -195,21 +201,22 @@ closeCorner.CornerRadius = UDim.new(0, 6)
 local minCorner = Instance.new("UICorner", minBtn)
 minCorner.CornerRadius = UDim.new(0, 6)
 
-closeBtn.MouseButton1Click:Connect(function()
-    gui:Destroy()
+closeBtn.MouseButton1Click\:Connect(function()
+gui\:Destroy()
 end)
 
-minBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = false
-    floatBtn.Visible = true
+minBtn.MouseButton1Click\:Connect(function()
+mainFrame.Visible = false
+floatBtn.Visible = true
 end)
 
-floatBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = true
-    floatBtn.Visible = false
+floatBtn.
+MouseButton1Click\:Connect(function()
+mainFrame.Visible = true
+floatBtn.Visible = false
 end)
 
--- Ativar aba padrão
+\-- Ativar aba padrão
 task.wait()
-tabFrames["Character"].Visible = true
-activeTab = tabFrames["Character"]
+tabFrames\["Character"].Visible = true
+activeTab = tabFrames\["Character"]
