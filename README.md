@@ -1,90 +1,119 @@
--- UI Library
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+-- Natan Dead Reails Hub para Dead Rails (Delta Android)
+-- Desenvolvido para uso educativo
 
--- Janela principal
-local Window = OrionLib:MakeWindow({
-    Name = "Dead Reails Hub",
-    HidePremium = false,
-    SaveConfig = false,
-    IntroEnabled = false,
-    CloseCallback = function()
-        OrionLib:Destroy()
-    end
-})
+-- Serviços
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
 
--- MAIN aba (padrão)
-local MainTab = Window:MakeTab({
-    Name = "Main",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- GUI
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "NatanHub"
+ScreenGui.ResetOnSpawn = false
 
--- CHARACTER aba
-local CharacterTab = Window:MakeTab({
-    Name = "Character",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Janela Principal
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Name = "MainFrame"
+MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
 
--- TELEPORT aba
-local TeleportTab = Window:MakeTab({
-    Name = "Teleport",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Título
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Text = "NatanHub | Dead Reails"
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 16
 
--- VISUAL aba
-local VisualTab = Window:MakeTab({
-    Name = "Visual",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Botões de Controle
+local CloseButton = Instance.new("TextButton", MainFrame)
+CloseButton.Text = "X"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -30, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.TextSize = 16
 
--- COMBAT aba
-local CombatTab = Window:MakeTab({
-    Name = "Combat",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local MinimizeButton = Instance.new("TextButton", MainFrame)
+MinimizeButton.Text = "-"
+MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -60, 0, 0)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
+MinimizeButton.Font = Enum.Font.SourceSansBold
+MinimizeButton.TextSize = 16
 
--- CONFIGURATION aba
-local ConfigTab = Window:MakeTab({
-    Name = "Configuration",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Área Interna
+local ContentFrame = Instance.new("Frame", MainFrame)
+ContentFrame.Size = UDim2.new(1, 0, 1, -30)
+ContentFrame.Position = UDim2.new(0, 0, 0, 30)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 
--- Funções reais que funcionam no jogo
-MainTab:AddSlider({
-    Name = "Walk Speed",
-    Min = 16,
-    Max = 100,
-    Default = 16,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,
-    ValueName = "WalkSpeed",
-    Callback = function(Value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-    end
-})
+-- Sliders (Simples usando TextBox)
+local SpeedLabel = Instance.new("TextLabel", ContentFrame)
+SpeedLabel.Text = "Walk Speed"
+SpeedLabel.Size = UDim2.new(1, -20, 0, 20)
+SpeedLabel.Position = UDim2.new(0, 10, 0, 10)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.TextColor3 = Color3.new(1, 1, 1)
+SpeedLabel.TextSize = 14
+SpeedLabel.Font = Enum.Font.SourceSans
 
-MainTab:AddSlider({
-    Name = "Jump Power",
-    Min = 50,
-    Max = 200,
-    Default = 50,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,
-    ValueName = "JumpPower",
-    Callback = function(Value)
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
-    end
-})
+local SpeedBox = Instance.new("TextBox", ContentFrame)
+SpeedBox.Text = "16"
+SpeedBox.Size = UDim2.new(1, -20, 0, 25)
+SpeedBox.Position = UDim2.new(0, 10, 0, 30)
+SpeedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SpeedBox.TextColor3 = Color3.new(1, 1, 1)
+SpeedBox.Font = Enum.Font.SourceSans
+SpeedBox.TextSize = 14
+SpeedBox.ClearTextOnFocus = false
 
--- Botão para minimizar (simulando o botão "-")
-ConfigTab:AddButton({
-    Name = "Ocultar Menu",
-    Callback = function()
-        game:GetService("CoreGui").Orion:Destroy()
-    end
-})
+local JumpLabel = Instance.new("TextLabel", ContentFrame)
+JumpLabel.Text = "Jump Power"
+JumpLabel.Size = UDim2.new(1, -20, 0, 20)
+JumpLabel.Position = UDim2.new(0, 10, 0, 60)
+JumpLabel.BackgroundTransparency = 1
+JumpLabel.TextColor3 = Color3.new(1, 1, 1)
+JumpLabel.TextSize = 14
+JumpLabel.Font = Enum.Font.SourceSans
+
+local JumpBox = Instance.new("TextBox", ContentFrame)
+JumpBox.Text = "50"
+JumpBox.Size = UDim2.new(1, -20, 0, 25)
+JumpBox.Position = UDim2.new(0, 10, 0, 80)
+JumpBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+JumpBox.TextColor3 = Color3.new(1, 1, 1)
+JumpBox.Font = Enum.Font.SourceSans
+JumpBox.TextSize = 14
+JumpBox.ClearTextOnFocus = false
+
+-- Funções
+SpeedBox.FocusLost:Connect(function()
+	local speed = tonumber(SpeedBox.Text)
+	if speed then
+		Humanoid.WalkSpeed = speed
+	end
+end)
+
+JumpBox.FocusLost:Connect(function()
+	local power = tonumber(JumpBox.Text)
+	if power then
+		Humanoid.JumpPower = power
+	end
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
+MinimizeButton.MouseButton1Click:Connect(function()
+	ContentFrame.Visible = not ContentFrame.Visible
+end)
