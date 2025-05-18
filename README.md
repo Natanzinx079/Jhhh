@@ -1,122 +1,119 @@
--- NatHub Remake 0.3.1 | Compatível com Delta Mobile
-local CoreGui = game:GetService("CoreGui")
-local Player = game.Players.LocalPlayer
-local Char = Player.Character or Player.CharacterAdded:Wait()
-
--- Criar ScreenGui
-local gui = Instance.new("ScreenGui")
-gui.Name = "NatHubUI"
-gui.ResetOnSpawn = false
-gui.Parent = CoreGui
+-- GUI principal
+local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.Name = "NatHub"
 
 -- Janela principal
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 450, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = gui
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 500, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+MainFrame.Visible = true
 
--- Título
-local titleBar = Instance.new("TextLabel")
-titleBar.Size = UDim2.new(1, 0, 0, 30)
-titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-titleBar.Text = "  NatHub | Dead Rails (0.3.1)"
-titleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleBar.TextXAlignment = Enum.TextXAlignment.Left
-titleBar.Font = Enum.Font.GothamBold
-titleBar.TextSize = 14
-titleBar.Parent = mainFrame
+-- Cantos arredondados
+local UICorner = Instance.new("UICorner", MainFrame)
+UICorner.CornerRadius = UDim.new(0, 6)
 
--- Botões de controle (fechar e ocultar)
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -30, 0, 0)
-closeBtn.Text = "X"
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
-closeBtn.BackgroundTransparency = 1
-closeBtn.Parent = mainFrame
+-- Botão de minimizar
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.new(0, 20, 0, 20)
+Minimize.Position = UDim2.new(1, -45, 0, 5)
+Minimize.Text = "-"
+Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+Minimize.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Minimize.BorderSizePixel = 0
+Minimize.Parent = MainFrame
 
-local minimizeBtn = Instance.new("TextButton")
-minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-minimizeBtn.Position = UDim2.new(1, -60, 0, 0)
-minimizeBtn.Text = "-"
-minimizeBtn.Font = Enum.Font.GothamBold
-minimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-minimizeBtn.BackgroundTransparency = 1
-minimizeBtn.Parent = mainFrame
+-- Botão de fechar
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0, 20, 0, 20)
+Close.Position = UDim2.new(1, -20, 0, 5)
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(255, 70, 70)
+Close.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Close.BorderSizePixel = 0
+Close.Parent = MainFrame
 
 -- Menu lateral
-local sideMenu = Instance.new("Frame")
-sideMenu.Size = UDim2.new(0, 120, 1, -30)
-sideMenu.Position = UDim2.new(0, 0, 0, 30)
-sideMenu.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-sideMenu.Parent = mainFrame
+local SideMenu = Instance.new("Frame")
+SideMenu.Size = UDim2.new(0, 130, 1, 0)
+SideMenu.Position = UDim2.new(0, 0, 0, 0)
+SideMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+SideMenu.BorderSizePixel = 0
+SideMenu.Parent = MainFrame
 
--- Conteúdo da aba
-local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(1, -120, 1, -30)
-contentFrame.Position = UDim2.new(0, 120, 0, 30)
-contentFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-contentFrame.Parent = mainFrame
+-- Abas laterais
+local Tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Configuration"}
+local Buttons = {}
 
--- Função para criar botão de aba
-local currentTab
-local function createTab(name, callback)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, 0, 0, 30)
-    button.Text = name
-    button.Font = Enum.Font.Gotham
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.BackgroundTransparency = 1
-    button.Parent = sideMenu
-    button.MouseButton1Click:Connect(function()
-        if currentTab then currentTab:Destroy() end
-        currentTab = Instance.new("Frame", contentFrame)
-        currentTab.Size = UDim2.new(1, 0, 1, 0)
-        currentTab.BackgroundTransparency = 1
-        callback(currentTab)
-    end)
+for i, name in ipairs(Tabs) do
+	local TabButton = Instance.new("TextButton")
+	TabButton.Size = UDim2.new(1, 0, 0, 35)
+	TabButton.Position = UDim2.new(0, 0, 0, (i - 1) * 36 + 10)
+	TabButton.Text = name
+	TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	TabButton.BorderSizePixel = 0
+	TabButton.Font = Enum.Font.GothamSemibold
+	TabButton.TextSize = 14
+	TabButton.Parent = SideMenu
+	Buttons[name] = TabButton
 end
 
--- Criação das abas e funções
-createTab("Character", function(tab)
-    local speedLabel = Instance.new("TextLabel", tab)
-    speedLabel.Size = UDim2.new(1, -20, 0, 30)
-    speedLabel.Position = UDim2.new(0, 10, 0, 10)
-    speedLabel.Text = "Walk Speed: " .. Char.Humanoid.WalkSpeed
-    speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    speedLabel.BackgroundTransparency = 1
-    speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+-- Área de conteúdo
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, -130, 1, -30)
+Content.Position = UDim2.new(0, 130, 0, 30)
+Content.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Content.BorderSizePixel = 0
+Content.Parent = MainFrame
 
-    local jumpLabel = Instance.new("TextLabel", tab)
-    jumpLabel.Size = UDim2.new(1, -20, 0, 30)
-    jumpLabel.Position = UDim2.new(0, 10, 0, 50)
-    jumpLabel.Text = "Jump Power: " .. Char.Humanoid.JumpPower
-    jumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    jumpLabel.BackgroundTransparency = 1
-    jumpLabel.TextXAlignment = Enum.TextXAlignment.Left
+-- Aba Character com sliders
+local function CreateSlider(name, min, max, default, yPos, onChange)
+	local label = Instance.new("TextLabel", Content)
+	label.Position = UDim2.new(0, 20, 0, yPos)
+	label.Size = UDim2.new(0, 150, 0, 20)
+	label.Text = name
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.BackgroundTransparency = 1
+	label.Font = Enum.Font.Gotham
+	label.TextSize = 14
+	
+	local slider = Instance.new("TextButton", Content)
+	slider.Position = UDim2.new(0, 180, 0, yPos)
+	slider.Size = UDim2.new(0, 200, 0, 20)
+	slider.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	slider.Text = tostring(default)
+	slider.TextColor3 = Color3.fromRGB(255, 255, 255)
+	slider.Font = Enum.Font.Gotham
+	slider.TextSize = 12
+	
+	slider.MouseButton1Click:Connect(function()
+		local new = tonumber(game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("NatHub"):WaitForChild("Input"):GetText())
+		if new and new >= min and new <= max then
+			slider.Text = tostring(new)
+			onChange(new)
+		end
+	end)
+end
+
+-- Character Sliders
+CreateSlider("Walk Speed", 0, 200, 16, 10, function(value)
+	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
 end)
 
-createTab("Main", function(tab)
-    local label = Instance.new("TextLabel", tab)
-    label.Text = "Main Tab – em desenvolvimento..."
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.BackgroundTransparency = 1
-    label.Position = UDim2.new(0, 10, 0, 10)
-    label.Size = UDim2.new(1, -20, 0, 30)
+CreateSlider("Jump Power", 0, 200, 50, 40, function(value)
+	game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
 end)
 
--- Fechar a UI
-closeBtn.MouseButton1Click:Connect(function()
-    gui:Destroy()
+-- Ocultar Menu
+Minimize.MouseButton1Click:Connect(function()
+	Content.Visible = not Content.Visible
+	SideMenu.Visible = not SideMenu.Visible
 end)
 
--- Ocultar/mostrar conteúdo
-local isMinimized = false
-minimizeBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    sideMenu.Visible = not isMinimized
-    contentFrame.Visible = not isMinimized
+-- Fechar GUI
+Close.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
 end)
