@@ -1,15 +1,22 @@
-b = tabFrames["Character"]
--- NatanHub completo para Dead Rails (0.3.1) - UI + funcionalidades
+-- NatanHub com visual aprimorado + funções completas para Dead Rails
 
 local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
 local Lighting = game:GetService("Lighting")
-local LocalPlayer = Players.LocalPlayer
+
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
-local Mouse = LocalPlayer:GetMouse()
 
+-- Cleanup existing GUI if any
+if game.CoreGui:FindFirstChild("NatanHub") then
+    game.CoreGui:FindFirstChild("NatanHub"):Destroy()
+end
+
+-- GUI Setup (igual ao seu, só com pequenas adaptações)
 local gui = Instance.new("ScreenGui")
 gui.Name = "NatanHub"
 gui.Parent = game.CoreGui
@@ -53,7 +60,7 @@ local titleBar = Instance.new("TextLabel")
 titleBar.Parent = mainFrame
 titleBar.Size = UDim2.new(1, 0, 0, 32)
 titleBar.BackgroundColor3 = highlightColor
-titleBar.Text = "NATAN DEAD RAILS 1.0"
+titleBar.Text = "NATAN DEAD REAILS 1.0"
 titleBar.TextColor3 = redColor
 titleBar.Font = Enum.Font.GothamBold
 titleBar.TextSize = 18
@@ -74,7 +81,7 @@ local UICornerSide = Instance.new("UICorner", sideMenu)
 UICornerSide.CornerRadius = UDim.new(0, 6)
 
 -- Tabs
-local tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Config"}
+local tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Configuration"}
 local tabFrames = {}
 local activeTab
 
@@ -92,13 +99,16 @@ for i, tabName in ipairs(tabs) do
     local UICornerBtn = Instance.new("UICorner", tabBtn)
     UICornerBtn.CornerRadius = UDim.new(0, 6)
 
-    local tabFrame = Instance.new("Frame")
+    local tabFrame = Instance.new("ScrollingFrame")
     tabFrame.Name = tabName .. "Frame"
     tabFrame.Size = UDim2.new(1, -130, 1, -32)
     tabFrame.Position = UDim2.new(0, 130, 0, 32)
     tabFrame.BackgroundColor3 = darkColor
+    tabFrame.BorderSizePixel = 0
     tabFrame.Visible = false
     tabFrame.Parent = mainFrame
+    tabFrame.CanvasSize = UDim2.new(0,0,3,0)
+    tabFrame.ScrollBarThickness = 6
 
     tabFrames[tabName] = tabFrame
 
@@ -109,7 +119,64 @@ for i, tabName in ipairs(tabs) do
     end)
 end
 
--- Helper para criar Labels
+-- FECHAR & MINIMIZAR
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = mainFrame
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+closeBtn.TextColor3 = textColor
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 16
+
+local minBtn = Instance.new("TextButton")
+minBtn.Parent = mainFrame
+minBtn.Text = "-"
+minBtn.Size = UDim2.new(0, 30, 0, 30)
+minBtn.Position = UDim2.new(1, -60, 0, 0)
+minBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+minBtn.TextColor3 = textColor
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 16
+
+local closeCorner = Instance.new("UICorner", closeBtn)
+closeCorner.CornerRadius = UDim.new(0, 6)
+local minCorner = Instance.new("UICorner", minBtn)
+minCorner.CornerRadius = UDim.new(0, 6)
+
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+minBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    floatBtn.Visible = true
+end)
+
+-- Botão flutuante para abrir a GUI
+local floatBtn = Instance.new("TextButton")
+floatBtn.Parent = gui
+floatBtn.Text = "NatanHub"
+floatBtn.Size = UDim2.new(0, 120, 0, 40)
+floatBtn.Position = UDim2.new(0, 10, 0, 10)
+floatBtn.BackgroundColor3 = accentColor
+floatBtn.TextColor3 = textColor
+floatBtn.Font = Enum.Font.GothamBold
+floatBtn.TextSize = 16
+floatBtn.Visible = false
+floatBtn.Active = true
+floatBtn.Draggable = true
+
+local floatCorner = Instance.new("UICorner", floatBtn)
+floatCorner.CornerRadius = UDim.new(0, 8)
+
+floatBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    floatBtn.Visible = false
+end)
+
+-- Função para criar labels
 local function createLabel(text, posY, parent)
     local label = Instance.new("TextLabel")
     label.Text = text
@@ -123,7 +190,44 @@ local function createLabel(text, posY, parent)
     return label
 end
 
--- Helper para criar TextBoxes
+-- Função para criar botões toggle
+local function createToggle(text, posY, parent, default, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 100, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.BackgroundColor3 = highlightColor
+    btn.TextColor3 = textColor
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Text = text .. ": OFF"
+    btn.Parent = parent
+
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 6)
+
+    local toggled = default
+
+    local function update()
+        if toggled then
+            btn.Text = text .. ": ON"
+            btn.BackgroundColor3 = accentColor
+        else
+            btn.Text = text .. ": OFF"
+            btn.BackgroundColor3 = highlightColor
+        end
+    end
+
+    btn.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        update()
+        callback(toggled)
+    end)
+
+    update()
+    return btn
+end
+
+-- Função para criar InputBox para números
 local function createInputBox(value, posY, parent, callback)
     local box = Instance.new("TextBox")
     box.Text = tostring(value)
@@ -146,316 +250,203 @@ local function createInputBox(value, posY, parent, callback)
     return box
 end
 
----------------------
--- Aba Character --
----------------------
+-- ====================
+-- Aba Character (WalkSpeed e JumpPower)
 local charTab = tabFrames["Character"]
 
 createLabel("Walk Speed", 20, charTab)
 createInputBox(Humanoid.WalkSpeed, 50, charTab, function(val)
-    if Humanoid and Humanoid.Parent then
-        Humanoid.WalkSpeed = val
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = val
     end
 end)
 
 createLabel("Jump Power", 90, charTab)
 createInputBox(Humanoid.JumpPower, 120, charTab, function(val)
-    if Humanoid and Humanoid.Parent then
-        Humanoid.JumpPower = val
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.JumpPower = val
     end
 end)
 
-----------------------
--- Aba Teleport --
-----------------------
-local teleportTab = tabFrames["Teleport"]
+-- ====================
+-- Aba Teleport
+local tpTab = tabFrames["Teleport"]
 
-createLabel("Teleport to Train", 10, teleportTab)
-local tpTrainBtn = Instance.new("TextButton")
-tpTrainBtn.Text = "Teleport Train"
-tpTrainBtn.Size = UDim2.new(0, 150, 0, 30)
-tpTrainBtn.Position = UDim2.new(0, 10, 0, 40)
-tpTrainBtn.BackgroundColor3 = accentColor
-tpTrainBtn.TextColor3 = textColor
-tpTrainBtn.Font = Enum.Font.GothamBold
-tpTrainBtn.TextSize = 14
-tpTrainBtn.Parent = teleportTab
-local cornerTpTrain = Instance.new("UICorner", tpTrainBtn)
-cornerTpTrain.CornerRadius = UDim.new(0, 6)
-
-tpTrainBtn.MouseButton1Click:Connect(function()
-    local train = workspace:FindFirstChild("Train") or workspace:FindFirstChild("TrainModel")
-    if train and Character and Character:FindFirstChild("HumanoidRootPart") then
-        Character.HumanoidRootPart.CFrame = train:GetModelCFrame() or train.CFrame or train.PrimaryPart.CFrame
-    else
-        warn("Train not found")
+-- Função para Teleportar o jogador para uma posição
+local function teleportTo(pos)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
     end
-end)
-
-createLabel("Teleport to Bases", 80, teleportTab)
-
--- Detectar todas bases no workspace (supondo que ficam em workspace.Bases)
-local basesFolder = workspace:FindFirstChild("Bases") or workspace:FindFirstChild("BasesFolder")
-
-local baseButtons = {}
-local baseY = 110
-
-if basesFolder then
-    for _, base in ipairs(basesFolder:GetChildren()) do
-        if base:IsA("BasePart") or base.PrimaryPart then
-            local baseBtn = Instance.new("TextButton")
-            baseBtn.Text = base.Name
-            baseBtn.Size = UDim2.new(0, 150, 0, 30)
-            baseBtn.Position = UDim2.new(0, 10, 0, baseY)
-            baseBtn.BackgroundColor3 = accentColor
-            baseBtn.TextColor3 = textColor
-            baseBtn.Font = Enum.Font.GothamBold
-            baseBtn.TextSize = 14
-            baseBtn.Parent = teleportTab
-            local corner = Instance.new("UICorner", baseBtn)
-            corner.CornerRadius = UDim.new(0, 6)
-
-            baseBtn.MouseButton1Click:Connect(function()
-                local targetCFrame
-                if base.PrimaryPart then
-                    targetCFrame = base.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
-                elseif base:IsA("BasePart") then
-                    targetCFrame = base.CFrame + Vector3.new(0, 3, 0)
-                end
-
-                if targetCFrame and Character and Character:FindFirstChild("HumanoidRootPart") then
-                    Character.HumanoidRootPart.CFrame = targetCFrame
-                end
-            end)
-            baseY = baseY + 40
-        end
-    end
-else
-    createLabel("Bases folder not found", 110, teleportTab)
 end
 
-createLabel("Teleport to End", baseY + 10, teleportTab)
-local tpEndBtn = Instance.new("TextButton")
-tpEndBtn.Text = "Teleport End"
-tpEndBtn.Size = UDim2.new(0, 150, 0, 30)
-tpEndBtn.Position = UDim2.new(0, 10, 0, baseY + 40)
-tpEndBtn.BackgroundColor3 = accentColor
-tpEndBtn.TextColor3 = textColor
-tpEndBtn.Font = Enum.Font.GothamBold
-tpEndBtn.TextSize = 14
-tpEndBtn.Parent = teleportTab
-local cornerTpEnd = Instance.new("UICorner", tpEndBtn)
-cornerTpEnd.CornerRadius = UDim.new(0, 6)
+createLabel("Teleport Options", 10, tpTab)
 
-tpEndBtn.MouseButton1Click:Connect(function()
-    local finish = workspace:FindFirstChild("Finish") or workspace:FindFirstChild("EndPoint")
-    if finish and finish:IsA("BasePart") and Character and Character:FindFirstChild("HumanoidRootPart") then
-        Character.HumanoidRootPart.CFrame = finish.CFrame + Vector3.new(0, 3, 0)
+-- Botões para teleport diferentes
+local btnTrainTP = Instance.new("TextButton")
+btnTrainTP.Size = UDim2.new(0, 150, 0, 35)
+btnTrainTP.Position = UDim2.new(0, 10, 0, 40)
+btnTrainTP.Text = "Teleport to Train"
+btnTrainTP.BackgroundColor3 = accentColor
+btnTrainTP.TextColor3 = textColor
+btnTrainTP.Font = Enum.Font.GothamBold
+btnTrainTP.TextSize = 16
+btnTrainTP.Parent = tpTab
+
+local cornerTrainTP = Instance.new("UICorner", btnTrainTP)
+cornerTrainTP.CornerRadius = UDim.new(0, 6)
+
+btnTrainTP.MouseButton1Click:Connect(function()
+    -- Tentativa de achar o trem (exemplo)
+    local train = Workspace:FindFirstChild("Train") or Workspace:FindFirstChild("TrainModel")
+    if train and train:FindFirstChild("PrimaryPart") then
+        teleportTo(train.PrimaryPart.Position + Vector3.new(0,5,0))
     else
-        warn("End not found")
+        -- Se não achar o trem, tenta achar outra base (exemplo)
+        local base = Workspace:FindFirstChild("Base") or Workspace:FindFirstChild("SpawnPoint")
+        if base and base:IsA("BasePart") then
+            teleportTo(base.Position + Vector3.new(0,5,0))
+        else
+            warn("Não foi possível encontrar o trem ou base para teleportar.")
+        end
     end
 end)
 
-----------------------
--- Aba Visual --
-----------------------
+-- Teleport para bases
+createLabel("Bases Teleport", 90, tpTab)
+
+local function createBaseButton(name, posY, position)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 150, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.Text = name
+    btn.BackgroundColor3 = highlightColor
+    btn.TextColor3 = textColor
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Parent = tpTab
+
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 6)
+
+    btn.MouseButton1Click:Connect(function()
+        teleportTo(position + Vector3.new(0,5,0))
+    end)
+end
+
+-- Exemplo de bases, ajustar para as posições reais do jogo
+createBaseButton("Base 1", 120, Vector3.new(100, 10, 100))
+createBaseButton("Base 2", 160, Vector3.new(200, 10, 200))
+createBaseButton("Base 3", 200, Vector3.new(300, 10, 300))
+
+-- Teleport final (exemplo)
+local btnFinalTP = Instance.new("TextButton")
+btnFinalTP.Size = UDim2.new(0, 150, 0, 35)
+btnFinalTP.Position = UDim2.new(0, 10, 0, 250)
+btnFinalTP.Text = "Teleport to End"
+btnFinalTP.BackgroundColor3 = accentColor
+btnFinalTP.TextColor3 = textColor
+btnFinalTP.Font = Enum.Font.GothamBold
+btnFinalTP.TextSize = 16
+btnFinalTP.Parent = tpTab
+
+local cornerFinalTP = Instance.new("UICorner", btnFinalTP)
+cornerFinalTP.CornerRadius = UDim.new(0, 6)
+
+btnFinalTP.MouseButton1Click:Connect(function()
+    -- Ajuste conforme o mapa real do jogo
+    local endPos = Vector3.new(1000, 10, 1000)
+    teleportTo(endPos)
+end)
+
+-- ====================
+-- Aba Visual (ESP, FullBright, Remove Fog, Unlock Mouse)
+
 local visualTab = tabFrames["Visual"]
 
--- FullBright toggle
-local fullBrightBtn = Instance.new("TextButton")
-fullBrightBtn.Text = "Toggle Full Bright"
-fullBrightBtn.Size = UDim2.new(0, 200, 0, 35)
-fullBrightBtn.Position = UDim2.new(0, 10, 0, 20)
-fullBrightBtn.BackgroundColor3 = accentColor
-fullBrightBtn.TextColor3 = textColor
-fullBrightBtn.Font = Enum.Font.GothamBold
-fullBrightBtn.TextSize = 14
-fullBrightBtn.Parent = visualTab
-local cornerFullBright = Instance.new("UICorner", fullBrightBtn)
-cornerFullBright.CornerRadius = UDim.new(0, 6)
+createLabel("Visual Options", 10, visualTab)
 
-local originalLightingSettings = {
-    Brightness = Lighting.Brightness,
-    ClockTime = Lighting.ClockTime,
-    FogEnd = Lighting.FogEnd,
-    GlobalShadows = Lighting.GlobalShadows,
-    Ambient = Lighting.Ambient,
-    OutdoorAmbient = Lighting.OutdoorAmbient,
-}
+-- ESP Variables
+local espEnabled = false
+local espLinesEnabled = false
+local espObjects = {}
 
-local fullBrightOn = false
-fullBrightBtn.MouseButton1Click:Connect(function()
-    fullBrightOn = not fullBrightOn
-    if fullBrightOn then
-        Lighting.Brightness = 2
-        Lighting.ClockTime = 14
-        Lighting.FogEnd = 100000
-        Lighting.GlobalShadows = false
-        Lighting.Ambient = Color3.new(1, 1, 1)
-        Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
-    else
-        Lighting.Brightness = originalLightingSettings.Brightness
-        Lighting.ClockTime = originalLightingSettings.ClockTime
-        Lighting.FogEnd = originalLightingSettings.FogEnd
-        Lighting.GlobalShadows = originalLightingSettings.GlobalShadows
-        Lighting.Ambient = originalLightingSettings.Ambient
-        Lighting.OutdoorAmbient = originalLightingSettings.OutdoorAmbient
-    end
-end)
+-- Função para criar ESP para um personagem
+local function createESP(player)
+    if espObjects[player] then return end
+    local espBox = Instance.new("BoxHandleAdornment")
+    espBox.Adornee = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not espBox.Adornee then return end
+    espBox.AlwaysOnTop = true
+    espBox.ZIndex = 10
+    espBox.Size = Vector3.new(4, 6, 4)
+    espBox.Color3 = Color3.fromRGB(0, 170, 255)
+    espBox.Transparency = 0.5
+    espBox.Parent = game.CoreGui
+    espObjects[player] = espBox
 
--- Remove Fog toggle
-local removeFogBtn = Instance.new("TextButton")
-removeFogBtn.Text = "Toggle Remove Fog"
-removeFogBtn.Size = UDim2.new(0, 200, 0, 35)
-removeFogBtn.Position = UDim2.new(0, 10, 0, 70)
-removeFogBtn.BackgroundColor3 = accentColor
-removeFogBtn.TextColor3 = textColor
-removeFogBtn.Font = Enum.Font.GothamBold
-removeFogBtn.TextSize = 14
-removeFogBtn.Parent = visualTab
-local cornerRemoveFog = Instance.new("UICorner", removeFogBtn)
-cornerRemoveFog.CornerRadius = UDim.new(0, 6)
+    -- Linha apontando
+    local line = Instance.new("LineHandleAdornment")
+    line.Adornee = workspace.CurrentCamera
+    line.From = workspace.CurrentCamera.CFrame.Position
+    line.To = espBox.Adornee.Position
+    line.Color3 = espBox.Color3
+    line.AlwaysOnTop = true
+    line.ZIndex = 10
+    line.Parent = game.CoreGui
+    espObjects[player .. "_line"] = line
+end
 
-local fogRemoved = false
-removeFogBtn.MouseButton1Click:Connect(function()
-    fogRemoved = not fogRemoved
-    if fogRemoved then
-        Lighting.FogEnd = 100000
-    else
-        Lighting.FogEnd = originalLightingSettings.FogEnd
-    end
-end)
-
-----------------------
--- Aba Combat --
-----------------------
-local combatTab = tabFrames["Combat"]
-
--- Kill Aura toggle
-local killAuraBtn = Instance.new("TextButton")
-killAuraBtn.Text = "Toggle Kill Aura"
-killAuraBtn.Size = UDim2.new(0, 150, 0, 35)
-killAuraBtn.Position = UDim2.new(0, 10, 0, 20)
-killAuraBtn.BackgroundColor3 = accentColor
-killAuraBtn.TextColor3 = textColor
-killAuraBtn.Font = Enum.Font.GothamBold
-killAuraBtn.TextSize = 14
-killAuraBtn.Parent = combatTab
-local cornerKillAura = Instance.new("UICorner", killAuraBtn)
-cornerKillAura.CornerRadius = UDim.new(0, 6)
-
-local killAuraOn = false
-local killRange = 10
-local RunService = game:GetService("RunService")
-
-killAuraBtn.MouseButton1Click:Connect(function()
-    killAuraOn = not killAuraOn
-end)
-
-RunService.Heartbeat:Connect(function()
-    if killAuraOn and Character and Character:FindFirstChild("HumanoidRootPart") then
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
-                local dist = (player.Character.HumanoidRootPart.Position - Character.HumanoidRootPart.Position).Magnitude
-                if dist <= killRange then
-                    -- Aplica dano (supondo método simples)
-                    player.Character.Humanoid.Health = 0
-                end
-            end
+local function removeESP()
+    for _, obj in pairs(espObjects) do
+        if obj and obj.Parent then
+            obj:Destroy()
         end
     end
-end)
+    espObjects = {}
+end
 
--- Noclip toggle
-local noclipBtn = Instance.new("TextButton")
-noclipBtn.Text = "Toggle Noclip"
-noclipBtn.Size = UDim2.new(0, 150, 0, 35)
-noclipBtn.Position = UDim2.new(0, 10, 0, 70)
-noclipBtn.BackgroundColor3 = accentColor
-noclipBtn.TextColor3 = textColor
-noclipBtn.Font = Enum.Font.GothamBold
-noclipBtn.TextSize = 14
-noclipBtn.Parent = combatTab
-local cornerNoclip = Instance.new("UICorner", noclipBtn)
-cornerNoclip.CornerRadius = UDim.new(0, 6)
-
-local noclipOn = false
-local function noclip(state)
-    if not Character then return end
-    for _, part in pairs(Character:GetChildren()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = not state
+local function updateESP()
+    for player, espBox in pairs(espObjects) do
+        if typeof(player) == "string" then continue end
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            espBox.Adornee = player.Character.HumanoidRootPart
+            -- Update line positions
+            local line = espObjects[player .. "_line"]
+            if line and line.Parent then
+                line.From = workspace.CurrentCamera.CFrame.Position
+                line.To = espBox.Adornee.Position
+            end
+        else
+            -- Remove ESP se o personagem sumiu
+            espBox:Destroy()
+            espObjects[player] = nil
+            local line = espObjects[player .. "_line"]
+            if line then
+                line:Destroy()
+                espObjects[player .. "_line"] = nil
+            end
         end
     end
 end
 
-noclipBtn.MouseButton1Click:Connect(function()
-    noclipOn = not noclipOn
-    noclip(noclipOn)
-end)
-
-----------------------
--- Aba Main --
-----------------------
-local mainTab = tabFrames["Main"]
-
--- Unlock Mouse
-local unlockMouseBtn = Instance.new("TextButton")
-unlockMouseBtn.Text = "Toggle Unlock Mouse"
-unlockMouseBtn.Size = UDim2.new(0, 180, 0, 35)
-unlockMouseBtn.Position = UDim2.new(0, 10, 0, 20)
-unlockMouseBtn.BackgroundColor3 = accentColor
-unlockMouseBtn.TextColor3 = textColor
-unlockMouseBtn.Font = Enum.Font.GothamBold
-unlockMouseBtn.TextSize = 14
-unlockMouseBtn.Parent = mainTab
-local cornerUnlockMouse = Instance.new("UICorner", unlockMouseBtn)
-cornerUnlockMouse.CornerRadius = UDim.new(0, 6)
-
-local mouseUnlocked = false
-unlockMouseBtn.MouseButton1Click:Connect(function()
-    mouseUnlocked = not mouseUnlocked
-    UserInputService.MouseBehavior = mouseUnlocked and Enum.MouseBehavior.Default or Enum.MouseBehavior.LockCenter
-    UserInputService.MouseIconEnabled = mouseUnlocked
-end)
-
--- Auto Farm Toggle
-local autoFarmBtn = Instance.new("TextButton")
-autoFarmBtn.Text = "Toggle Auto Farm"
-autoFarmBtn.Size = UDim2.new(0, 180, 0, 35)
-autoFarmBtn.Position = UDim2.new(0, 10, 0, 70)
-autoFarmBtn.BackgroundColor3 = accentColor
-autoFarmBtn.TextColor3 = textColor
-autoFarmBtn.Font = Enum.Font.GothamBold
-autoFarmBtn.TextSize = 14
-autoFarmBtn.Parent = mainTab
-local cornerAutoFarm = Instance.new("UICorner", autoFarmBtn)
-cornerAutoFarm.CornerRadius = UDim.new(0, 6)
-
-local autoFarmOn = false
-
-autoFarmBtn.MouseButton1Click:Connect(function()
-    autoFarmOn = not autoFarmOn
-end)
-
--- Auto Farm loop
-RunService.Heartbeat:Connect(function()
-    if autoFarmOn and Character and Character:FindFirstChild("HumanoidRootPart") then
-        -- Exemplo: Teleportar para bases automaticamente e coletar
-        if basesFolder then
-            for _, base in ipairs(basesFolder:GetChildren()) do
-                if base.PrimaryPart then
-                    Character.HumanoidRootPart.CFrame = base.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
-                    wait(1)
-                elseif base:IsA("BasePart") then
-                    Character.HumanoidRootPart.CFrame = base.CFrame + Vector3.new(0, 3, 0)
-                    wait(1)
-                end
+local espToggle = createToggle("ESP Players", 40, visualTab, false, function(state)
+    espEnabled = state
+    if not espEnabled then
+        removeESP()
+    else
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                createESP(player)
             end
         end
     end
 end)
 
--- Abrir Aba Main por padrão
-tabFrames["Main"].Visible = true
-activeTab = tabFrames["Main"]
+-- Atualiza ESP a cada frame se ativado
+RunService.RenderStepped:Connect(function()
+    if espEnabled then
+        updateESP()
+    end
+end)
+
+-- ESP para Trem
