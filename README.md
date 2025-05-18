@@ -1,139 +1,175 @@
--- NatHub | Dead Rails (0.3.1) com abas e funções adicionais
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+-- NatHub 0.3.1 (Estilo moderno) - Compatível com Android
+-- Desenvolvido para o jogo Dead Rails
 
--- Criar Janela Principal
-local mainFrame = Instance.new("Frame", gui)
-mainFrame.Size = UDim2.new(0, 300, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-mainFrame.BorderSizePixel = 0
-mainFrame.Visible = true
-mainFrame.Name = "NatHub"
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CloseBtn = Instance.new("TextButton")
+local MinBtn = Instance.new("TextButton")
+local TabButtons = Instance.new("Frame")
+local Tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Configuration"}
+local TabFrames = {}
+local ToggleGui = Instance.new("TextButton")
 
--- Título
-local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(1, 0, 0, 25)
-title.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-title.Text = "NatHub | Dead Rails (0.3.1)"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextScaled = true
+-- Gui settings
+ScreenGui.Name = "NatHub"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Botão de fechar
-local closeButton = Instance.new("TextButton", mainFrame)
-closeButton.Size = UDim2.new(0, 25, 0, 25)
-closeButton.Position = UDim2.new(1, -25, 0, 0)
-closeButton.Text = "X"
-closeButton.BackgroundColor3 = Color3.new(0.2, 0, 0)
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.MouseButton1Click:Connect(function()
-    gui:Destroy()
-end)
+-- Toggle button
+ToggleGui.Name = "ToggleGui"
+ToggleGui.Parent = ScreenGui
+ToggleGui.Size = UDim2.new(0, 100, 0, 40)
+ToggleGui.Position = UDim2.new(0, 20, 1, -60)
+ToggleGui.Text = "NatHub"
+ToggleGui.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ToggleGui.TextColor3 = Color3.new(1, 1, 1)
+ToggleGui.BorderSizePixel = 0
+ToggleGui.AutoButtonColor = true
+ToggleGui.Visible = true
 
--- Botão de ocultar
-local minimizeButton = Instance.new("TextButton", mainFrame)
-minimizeButton.Size = UDim2.new(0, 25, 0, 25)
-minimizeButton.Position = UDim2.new(1, -50, 0, 0)
-minimizeButton.Text = "-"
-minimizeButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0)
-minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+-- Main UI frame
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 500, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = true
 
-local contentVisible = true
+-- Top Bar
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.Size = UDim2.new(1, 0, 0, 30)
+TopBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+TopBar.BorderSizePixel = 0
 
-minimizeButton.MouseButton1Click:Connect(function()
-    contentVisible = not contentVisible
-    for _, child in pairs(mainFrame:GetChildren()) do
-        if child ~= title and child ~= closeButton and child ~= minimizeButton then
-            child.Visible = contentVisible
-        end
-    end
-end)
+-- Title
+Title.Name = "Title"
+Title.Parent = TopBar
+Title.Size = UDim2.new(1, -60, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Text = "NatHub | Dead Rails (0.3.1)"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundTransparency = 1
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
 
--- Abas
-local tabs = {
-    "Main",
-    "Character",
-    "Teleport",
-    "Visual",
-    "Combat",
-    "Configuration"
-}
+-- Close and Minimize Buttons
+CloseBtn.Name = "CloseBtn"
+CloseBtn.Parent = TopBar
+CloseBtn.Text = "X"
+CloseBtn.Size = UDim2.new(0, 30, 1, 0)
+CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+CloseBtn.BorderSizePixel = 0
 
-local selectedTab = "Main"
+MinBtn.Name = "MinBtn"
+MinBtn.Parent = TopBar
+MinBtn.Text = "–"
+MinBtn.Size = UDim2.new(0, 30, 1, 0)
+MinBtn.Position = UDim2.new(1, -60, 0, 0)
+MinBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MinBtn.TextColor3 = Color3.new(1, 1, 1)
+MinBtn.BorderSizePixel = 0
 
--- Criar Abas
-local tabButtons = {}
-for i, tabName in ipairs(tabs) do
-    local tab = Instance.new("TextButton", mainFrame)
-    tab.Size = UDim2.new(0, 100, 0, 25)
-    tab.Position = UDim2.new(0, (i - 1) * 100, 0, 30)
-    tab.Text = tabName
-    tab.TextColor3 = Color3.new(1, 1, 1)
-    tab.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-    tab.MouseButton1Click:Connect(function()
-        selectedTab = tabName
-        for _, v in pairs(mainFrame:GetChildren()) do
-            if v:IsA("Frame") and v.Name ~= "NatHub" then
-                v.Visible = false
-            end
-        end
-        if mainFrame:FindFirstChild(tabName) then
-            mainFrame[tabName].Visible = true
-        end
-    end)
-    table.insert(tabButtons, tab)
-end
+-- Tab Buttons
+TabButtons.Name = "TabButtons"
+TabButtons.Parent = MainFrame
+TabButtons.Size = UDim2.new(0, 120, 1, -30)
+TabButtons.Position = UDim2.new(0, 0, 0, 30)
+TabButtons.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TabButtons.BorderSizePixel = 0
 
--- Criar Conteúdo de cada aba
-local function createTabContent(name)
-    local frame = Instance.new("Frame", mainFrame)
-    frame.Name = name
-    frame.Size = UDim2.new(1, -10, 1, -65)
-    frame.Position = UDim2.new(0, 5, 0, 60)
-    frame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-    frame.Visible = name == "Main"
-    return frame
-end
-
-local mainTab = createTabContent("Main")
-local charTab = createTabContent("Character")
-local teleportTab = createTabContent("Teleport")
-local visualTab = createTabContent("Visual")
-local combatTab = createTabContent("Combat")
-local configTab = createTabContent("Configuration")
-
--- Funções para Teleporte
-local teleportBtn = Instance.new("TextButton", teleportTab)
-teleportBtn.Size = UDim2.new(0.8, 0, 0, 30)
-teleportBtn.Position = UDim2.new(0.1, 0, 0, 10)
-teleportBtn.Text = "Teleport: Base"
-teleportBtn.TextColor3 = Color3.new(1, 1, 1)
-teleportBtn.BackgroundColor3 = Color3.new(0.2, 0.2, 0.4)
-teleportBtn.MouseButton1Click:Connect(function()
-    local char = player.Character or player.CharacterAdded:Wait()
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        char:MoveTo(Vector3.new(0, 10, 0)) -- Posição exemplo da base
-    end
-end)
-
--- Placeholder para outras funções
-local function addPlaceholderButton(tab, text, ypos)
-    local btn = Instance.new("TextButton", tab)
-    btn.Size = UDim2.new(0.8, 0, 0, 30)
-    btn.Position = UDim2.new(0.1, 0, 0, ypos)
-    btn.Text = text
+-- Create tab buttons
+for i, tabName in ipairs(Tabs) do
+    local btn = Instance.new("TextButton")
+    btn.Name = tabName .. "Btn"
+    btn.Parent = TabButtons
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    btn.Text = tabName
     btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-    return btn
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.BorderSizePixel = 0
+
+    local frame = Instance.new("Frame")
+    frame.Name = tabName .. "Frame"
+    frame.Parent = MainFrame
+    frame.Size = UDim2.new(1, -120, 1, -30)
+    frame.Position = UDim2.new(0, 120, 0, 30)
+    frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    frame.Visible = false
+    TabFrames[tabName] = frame
+
+    btn.MouseButton1Click:Connect(function()
+        for _, fr in pairs(TabFrames) do
+            fr.Visible = false
+        end
+        frame.Visible = true
+    end)
 end
 
-addPlaceholderButton(mainTab, "Auto Win (Em breve)", 10)
-addPlaceholderButton(mainTab, "Coletar Ouro (Em breve)", 50)
-addPlaceholderButton(charTab, "Aumentar Velocidade (Em breve)", 10)
-addPlaceholderButton(combatTab, "Ataque Rápido (Em breve)", 10)
-addPlaceholderButton(visualTab, "Tema Escuro (Ativo)", 10)
-addPlaceholderButton(configTab, "Reiniciar GUI", 10).MouseButton1Click:Connect(function()
-    gui:Destroy()
+-- Funções simples no tab "Character"
+local wsLabel = Instance.new("TextLabel", TabFrames["Character"])
+wsLabel.Text = "Walk Speed"
+wsLabel.Size = UDim2.new(0, 100, 0, 20)
+wsLabel.Position = UDim2.new(0, 10, 0, 10)
+wsLabel.BackgroundTransparency = 1
+wsLabel.TextColor3 = Color3.new(1, 1, 1)
+
+local wsSlider = Instance.new("TextBox", TabFrames["Character"])
+wsSlider.Size = UDim2.new(0, 60, 0, 25)
+wsSlider.Position = UDim2.new(0, 120, 0, 10)
+wsSlider.Text = "16"
+wsSlider.TextColor3 = Color3.new(1, 1, 1)
+wsSlider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+local jpLabel = Instance.new("TextLabel", TabFrames["Character"])
+jpLabel.Text = "Jump Power"
+jpLabel.Size = UDim2.new(0, 100, 0, 20)
+jpLabel.Position = UDim2.new(0, 10, 0, 40)
+jpLabel.BackgroundTransparency = 1
+jpLabel.TextColor3 = Color3.new(1, 1, 1)
+
+local jpSlider = Instance.new("TextBox", TabFrames["Character"])
+jpSlider.Size = UDim2.new(0, 60, 0, 25)
+jpSlider.Position = UDim2.new(0, 120, 0, 40)
+jpSlider.Text = "50"
+jpSlider.TextColor3 = Color3.new(1, 1, 1)
+jpSlider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+wsSlider.FocusLost:Connect(function()
+    local num = tonumber(wsSlider.Text)
+    if num then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = num
+    end
 end)
 
--- Pronto para adicionar mais funções reais!
+jpSlider.FocusLost:Connect(function()
+    local num = tonumber(jpSlider.Text)
+    if num then
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = num
+    end
+end)
+
+-- Close and Minimize logic
+CloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+end)
+
+MinBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    ToggleGui.Visible = true
+end)
+
+ToggleGui.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    ToggleGui.Visible = false
+end)
+
+-- Ativar aba Main por padrão
+TabFrames["Main"].Visible = true
