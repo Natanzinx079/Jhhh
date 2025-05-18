@@ -152,68 +152,34 @@ createInputBox(LocalPlayer.Character.Humanoid.JumpPower, 120, function(val)
     LocalPlayer.Character.Humanoid.JumpPower = val
 end)
 
--- Conteúdo do Visual (NatanHub com visual aprimorado)
+-- Conteúdo da aba Visual
 local visualTab = tabFrames["Visual"]
 
-local function createToggle(text, posY, callback)
-    local toggle = Instance.new("TextButton")
-    toggle.Text = text
-    toggle.Size = UDim2.new(0, 200, 0, 30)
-    toggle.Position = UDim2.new(0, 10, 0, posY)
-    toggle.BackgroundColor3 = highlightColor
-    toggle.TextColor3 = textColor
-    toggle.Font = Enum.Font.Gotham
-    toggle.TextSize = 14
-    toggle.Parent = visualTab
+local function createVisualButton(name, posY, callback)
+    local btn = Instance.new("TextButton")
+    btn.Text = name
+    btn.Size = UDim2.new(0, 180, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.BackgroundColor3 = highlightColor
+    btn.TextColor3 = textColor
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Parent = visualTab
 
-    local corner = Instance.new("UICorner", toggle)
+    local corner = Instance.new("UICorner", btn)
     corner.CornerRadius = UDim.new(0, 6)
 
-    local isActive = false
-    toggle.MouseButton1Click:Connect(function()
-        isActive = not isActive
-        toggle.BackgroundColor3 = isActive and accentColor or highlightColor
-        pcall(callback, isActive)
+    btn.MouseButton1Click:Connect(callback or function()
+        print(name .. " ativado!") -- Placeholder de função
     end)
 
-    return toggle
+    return btn
 end
 
--- Funções ESP adaptadas para Dead Rails
-local function espToggle(targetName, active)
-    for _, obj in pairs(workspace:GetChildren()) do
-        if obj:IsA("Model") and obj:FindFirstChild("HumanoidRootPart") and obj.Name:match(targetName) then
-            if active then
-                local esp = Instance.new("Highlight")
-                esp.Parent = obj
-                esp.FillColor = Color3.fromRGB(0, 170, 255)
-                esp.FillTransparency = 0.5
-                esp.OutlineTransparency = 0
-            else
-                for _, v in pairs(obj:GetChildren()) do
-                    if v:IsA("Highlight") then
-                        v:Destroy()
-                    end
-                end
-            end
-        end
-    end
-end
-
-createToggle("ESP Item", 20, function(active)
-    espToggle("Item", active) -- Adaptação para detectar itens em Dead Rails
-end)
-
-createToggle("ESP Train", 60, function(active)
-    espToggle("Train", active) -- Adaptação para destacar trens no jogo
-end)
-
--- Função Mouse Lock ajustada para Dead Rails
-local UserInputService = game:GetService("UserInputService")
-
-createToggle("Mouse Lock", 100, function(active)
-    UserInputService.MouseBehavior = active and Enum.MouseBehavior.LockCenter or Enum.MouseBehavior.Default
-end)
+createVisualButton("Barra de Ouro ESP", 20)
+createVisualButton("Item ESP", 60)
+createVisualButton("Train ESP", 100)
+createVisualButton("Mouse Lock", 140)
 
 -- Botão flutuante
 local floatBtn = Instance.new("TextButton")
