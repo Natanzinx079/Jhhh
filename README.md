@@ -25,8 +25,8 @@ local iconList = {
 -- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 550, 0, 320)
-mainFrame.Position = UDim2.new(0.5, -275, 0.5, -160)
+mainFrame.Size = UDim2.new(0, 500, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
 mainFrame.BackgroundColor3 = darkColor
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = gui
@@ -34,31 +34,23 @@ mainFrame.Visible = true
 mainFrame.Active = true
 mainFrame.Draggable = true
 
--- UICorner (bordas arredondadas)
-local corner = Instance.new("UICorner", mainFrame)
-corner.CornerRadius = UDim.new(0, 8)
-
 -- Title Bar
 local titleBar = Instance.new("TextLabel")
 titleBar.Parent = mainFrame
 titleBar.Size = UDim2.new(1, 0, 0, 30)
 titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-titleBar.Text = "  NatHub | Dead Rails (0.3.1)"
+titleBar.Text = "NatHub | Dead Rails (0.3.1)"
 titleBar.TextColor3 = textColor
 titleBar.Font = Enum.Font.SourceSansBold
 titleBar.TextSize = 16
-titleBar.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Side Menu
 local sideMenu = Instance.new("Frame")
 sideMenu.Name = "SideMenu"
-sideMenu.Size = UDim2.new(0, 140, 1, -30)
+sideMenu.Size = UDim2.new(0, 130, 1, -30)
 sideMenu.Position = UDim2.new(0, 0, 0, 30)
-sideMenu.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+sideMenu.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 sideMenu.Parent = mainFrame
-
-local sideCorner = Instance.new("UICorner", sideMenu)
-sideCorner.CornerRadius = UDim.new(0, 6)
 
 -- Tabs
 local tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Configuration"}
@@ -67,39 +59,38 @@ local activeTab
 
 for i, tabName in ipairs(tabs) do
     local tabBtn = Instance.new("TextButton")
-    tabBtn.Size = UDim2.new(1, 0, 0, 40)
-    tabBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
-    tabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    tabBtn.Text = "     " .. tabName
+    tabBtn.Size = UDim2.new(1, 0, 0, 35)
+    tabBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 35)
+    tabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    tabBtn.Text = "  " .. tabName
     tabBtn.TextColor3 = textColor
     tabBtn.Font = Enum.Font.SourceSansBold
     tabBtn.TextSize = 14
     tabBtn.TextXAlignment = Enum.TextXAlignment.Left
     tabBtn.Parent = sideMenu
 
+    -- Icon
     local icon = Instance.new("ImageLabel")
     icon.Image = iconList[tabName] or ""
     icon.Size = UDim2.new(0, 20, 0, 20)
-    icon.Position = UDim2.new(0, 10, 0.5, -10)
+    icon.Position = UDim2.new(0, 5, 0.5, -10)
     icon.BackgroundTransparency = 1
     icon.Parent = tabBtn
 
+    -- Tab Content Frame
     local tabFrame = Instance.new("Frame")
     tabFrame.Name = tabName .. "Frame"
-    tabFrame.Size = UDim2.new(1, -140, 1, -30)
-    tabFrame.Position = UDim2.new(0, 140, 0, 30)
-    tabFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tabFrame.Size = UDim2.new(1, -130, 1, -30)
+    tabFrame.Position = UDim2.new(0, 130, 0, 30)
+    tabFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     tabFrame.Visible = false
     tabFrame.Parent = mainFrame
-
-    local tfCorner = Instance.new("UICorner", tabFrame)
-    tfCorner.CornerRadius = UDim.new(0, 6)
 
     tabFrames[tabName] = tabFrame
 
     tabBtn.MouseButton1Click:Connect(function()
         if activeTab and activeTab ~= tabFrame then
-            local fadeOut = TweenService:Create(activeTab, TweenInfo.new(0.15), {BackgroundTransparency = 1})
+            local fadeOut = TweenService:Create(activeTab, TweenInfo.new(0.2), {BackgroundTransparency = 1})
             fadeOut:Play()
             fadeOut.Completed:Wait()
             activeTab.Visible = false
@@ -108,7 +99,7 @@ for i, tabName in ipairs(tabs) do
 
         tabFrame.Visible = true
         tabFrame.BackgroundTransparency = 1
-        local fadeIn = TweenService:Create(tabFrame, TweenInfo.new(0.15), {BackgroundTransparency = 0})
+        local fadeIn = TweenService:Create(tabFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0})
         fadeIn:Play()
         activeTab = tabFrame
     end)
@@ -163,7 +154,7 @@ floatBtn.MouseButton1Click:Connect(function()
     floatBtn.Visible = false
 end)
 
--- Mostrar a aba Character como padrão
+-- Ativar a aba "Character" como padrão
 wait()
 tabFrames["Character"].Visible = true
 activeTab = tabFrames["Character"]
