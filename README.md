@@ -1,131 +1,107 @@
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/natxhub/nathubui/main/ui.lua"))()
-local hub = library:CreateWindow("NatHub | Dead Rails (0.3.1)", "by NataX | .gg/nathub")
+-- Criação do GUI principal
+local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.Name = "NatHubRemastered"
 
--- Tabs
-local main = hub:AddTab("Main", "Settings and automation")
-local character = hub:AddTab("Character", "Movement cheats")
-local teleport = hub:AddTab("Teleport", "Area teleporters")
-local visual = hub:AddTab("Visual", "Graphics/ESP")
-local combat = hub:AddTab("Combat", "Combat advantages")
-local config = hub:AddTab("Configuration", "UI & hotkeys")
+-- Janela principal
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 400, 0, 250)
+MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
 
--- Main
-main:AddButton("Auto Collect Gold", function()
-    task.spawn(function()
-        while wait(0.5) do
-            for _, gold in ipairs(workspace.Gold:GetChildren()) do
-                if gold:IsA("Part") then
-                    gold.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-                end
-            end
-        end
-    end)
+-- Borda arredondada
+local UICorner = Instance.new("UICorner", MainFrame)
+UICorner.CornerRadius = UDim.new(0, 6)
+
+-- Título
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, -50, 0, 30)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "NatHub | Dead Rails (0.3.1)"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.Gotham
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Botão de fechar (X)
+local CloseBtn = Instance.new("TextButton", MainFrame)
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+CloseBtn.Text = "X"
+CloseBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+CloseBtn.TextColor3 = Color3.new(1, 0.5, 0.5)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 14
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
 end)
 
-main:AddButton("Reset Position", function()
-    game.Players.LocalPlayer.Character:MoveTo(Vector3.new(0, 10, 0))
-end)
+-- Botão de minimizar (-)
+local MinBtn = Instance.new("TextButton", MainFrame)
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -60, 0, 0)
+MinBtn.Text = "-"
+MinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MinBtn.TextColor3 = Color3.new(1, 1, 0.5)
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 14
 
--- Character
-character:AddSlider("Walk Speed", 16, 500, function(value)
-    local humanoid = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
-    if humanoid then humanoid.WalkSpeed = value end
-end)
-
-character:AddSlider("Jump Power", 50, 500, function(value)
-    local humanoid = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
-    if humanoid then humanoid.JumpPower = value end
-end)
-
--- Infinite Jump fix (com debounce)
-local InfiniteJumpEnabled = false
-character:AddToggle("Infinite Jump", false, function(state)
-    InfiniteJumpEnabled = state
-end)
-
-game:GetService("UserInputService").JumpRequest:Connect(function()
-    if InfiniteJumpEnabled then
-        local humanoid = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
-        if humanoid then
-            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-        end
-    end
-end)
-
--- Combat
-local AutoKillEnabled = false
-combat:AddToggle("Auto Kill", false, function(state)
-    AutoKillEnabled = state
-    task.spawn(function()
-        while AutoKillEnabled do
-            for _, enemy in ipairs(workspace.Enemies:GetChildren()) do
-                if enemy:FindFirstChild("Humanoid") then
-                    enemy.Humanoid.Health = 0
-                end
-            end
-            task.wait(0.2)
-        end
-    end)
-end)
-
-combat:AddToggle("One Hit Kill", false, function(state)
-    if state then
-        for _, tool in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-            if tool:IsA("Tool") and tool:FindFirstChild("Handle") then
-                tool.Handle.Touched:Connect(function(hit)
-                    local hum = hit.Parent:FindFirstChild("Humanoid")
-                    if hum then hum.Health = 0 end
-                end)
+local Minimized = false
+MinBtn.MouseButton1Click:Connect(function()
+    Minimized = not Minimized
+    for _, v in pairs(MainFrame:GetChildren()) do
+        if v:IsA("Frame") or v:IsA("TextButton") or v:IsA("TextLabel") then
+            if v ~= Title and v ~= CloseBtn and v ~= MinBtn then
+                v.Visible = not Minimized
             end
         end
     end
 end)
 
-combat:AddToggle("God Mode", false, function(state)
-    if state then
-        local humanoid = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-        if humanoid then humanoid.Name = "God" end
-    end
+-- Container das opções
+local OptionsFrame = Instance.new("Frame", MainFrame)
+OptionsFrame.Size = UDim2.new(1, -20, 1, -40)
+OptionsFrame.Position = UDim2.new(0, 10, 0, 40)
+OptionsFrame.BackgroundTransparency = 1
+
+-- WalkSpeed Slider
+local WalkSpeedSlider = Instance.new("TextButton", OptionsFrame)
+WalkSpeedSlider.Size = UDim2.new(1, 0, 0, 40)
+WalkSpeedSlider.Position = UDim2.new(0, 0, 0, 0)
+WalkSpeedSlider.Text = "Walk Speed: 16"
+WalkSpeedSlider.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+WalkSpeedSlider.TextColor3 = Color3.new(1, 1, 1)
+WalkSpeedSlider.Font = Enum.Font.Gotham
+WalkSpeedSlider.TextSize = 14
+
+local WalkSpeed = 16
+WalkSpeedSlider.MouseButton1Click:Connect(function()
+    WalkSpeed = WalkSpeed + 10
+    if WalkSpeed > 200 then WalkSpeed = 16 end
+    WalkSpeedSlider.Text = "Walk Speed: " .. WalkSpeed
+    local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.WalkSpeed = WalkSpeed end
 end)
 
--- Teleport
-teleport:AddButton("Tp To Tesla", function()
-    game.Players.LocalPlayer.Character:MoveTo(Vector3.new(350, 10, -280))
-end)
+-- JumpPower Slider
+local JumpPowerSlider = Instance.new("TextButton", OptionsFrame)
+JumpPowerSlider.Size = UDim2.new(1, 0, 0, 40)
+JumpPowerSlider.Position = UDim2.new(0, 0, 0, 50)
+JumpPowerSlider.Text = "Jump Power: 50"
+JumpPowerSlider.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+JumpPowerSlider.TextColor3 = Color3.new(1, 1, 1)
+JumpPowerSlider.Font = Enum.Font.Gotham
+JumpPowerSlider.TextSize = 14
 
-teleport:AddButton("Tp To End", function()
-    game.Players.LocalPlayer.Character:MoveTo(Vector3.new(999, 10, 999))
-end)
-
-teleport:AddDropdown("Select Base", {"Base 1", "Base 2", "Base 3"}, function(selected)
-    _G.SelectedBase = selected
-end)
-
-teleport:AddButton("Teleport", function()
-    local pos = {
-        ["Base 1"] = Vector3.new(10, 10, 10),
-        ["Base 2"] = Vector3.new(50, 10, 50),
-        ["Base 3"] = Vector3.new(100, 10, 100)
-    }
-    if _G.SelectedBase then
-        game.Players.LocalPlayer.Character:MoveTo(pos[_G.SelectedBase])
-    end
-end)
-
--- Visual
-visual:AddToggle("No Fog", false, function(state)
-    game:GetService("Lighting").FogEnd = state and 1e10 or 1000
-end)
-
-visual:AddToggle("Theme Switch", false, function(state)
-    library:SetTheme(state and "Light" or "Dark")
-end)
-
--- Config
-config:AddKeybind("Toggle UI", Enum.KeyCode.RightShift, function()
-    library:ToggleUI()
-end)
-
-config:AddButton("Unload UI", function()
-    library:Destroy()
+local JumpPower = 50
+JumpPowerSlider.MouseButton1Click:Connect(function()
+    JumpPower = JumpPower + 25
+    if JumpPower > 300 then JumpPower = 50 end
+    JumpPowerSlider.Text = "Jump Power: " .. JumpPower
+    local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.JumpPower = JumpPower end
 end)
