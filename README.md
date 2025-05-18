@@ -152,6 +152,69 @@ createInputBox(LocalPlayer.Character.Humanoid.JumpPower, 120, function(val)
     LocalPlayer.Character.Humanoid.JumpPower = val
 end)
 
+-- Conteúdo do Visual (NatanHub com visual aprimorado)
+local visualTab = tabFrames["Visual"]
+
+local function createToggle(text, posY, callback)
+    local toggle = Instance.new("TextButton")
+    toggle.Text = text
+    toggle.Size = UDim2.new(0, 200, 0, 30)
+    toggle.Position = UDim2.new(0, 10, 0, posY)
+    toggle.BackgroundColor3 = highlightColor
+    toggle.TextColor3 = textColor
+    toggle.Font = Enum.Font.Gotham
+    toggle.TextSize = 14
+    toggle.Parent = visualTab
+
+    local corner = Instance.new("UICorner", toggle)
+    corner.CornerRadius = UDim.new(0, 6)
+
+    local isActive = false
+    toggle.MouseButton1Click:Connect(function()
+        isActive = not isActive
+        toggle.BackgroundColor3 = isActive and accentColor or highlightColor
+        pcall(callback, isActive)
+    end)
+
+    return toggle
+end
+
+-- Funções ESP
+local function espToggle(targetName, active)
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj:FindFirstChild("HumanoidRootPart") and obj.Name == targetName then
+            if active then
+                local esp = Instance.new("Highlight")
+                esp.Parent = obj
+                esp.FillColor = Color3.fromRGB(0, 170, 255)
+                esp.FillTransparency = 0.5
+                esp.OutlineTransparency = 0
+            else
+                for _, v in pairs(obj:GetChildren()) do
+                    if v:IsA("Highlight") then
+                        v:Destroy()
+                    end
+                end
+            end
+        end
+    end
+end
+
+createToggle("Esp Item", 20, function(active)
+    espToggle("ItemName", active)
+end)
+
+createToggle("Esp Train", 60, function(active)
+    espToggle("TrainName", active)
+end)
+
+-- Função Mouse Lock
+local UserInputService = game:GetService("UserInputService")
+
+createToggle("Mouse Lock", 100, function(active)
+    UserInputService.MouseBehavior = active and Enum.MouseBehavior.LockCenter or Enum.MouseBehavior.Default
+end)
+
 -- Botão flutuante
 local floatBtn = Instance.new("TextButton")
 floatBtn.Parent = gui
