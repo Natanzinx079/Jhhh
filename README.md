@@ -1,166 +1,197 @@
+-- NatanHub com visual e funções aprimorados
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
--- GUI Principal
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "NatanHub"
+local gui = Instance.new("ScreenGui")
+gui.Name = "NatanHub"
+gui.Parent = game.CoreGui
 
--- Função para criar botões laterais
-local function CreateSideButton(name, parent, posY)
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(1, 0, 0, 30)
-	btn.Position = UDim2.new(0, 0, 0, posY)
-	btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-	btn.Text = name
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.Font = Enum.Font.SourceSansBold
-	btn.TextSize = 14
-	btn.Parent = parent
-	return btn
+gui.ResetOnSpawn = false
+
+-- UI Styles
+local darkColor = Color3.fromRGB(20, 20, 20)
+local accentColor = Color3.fromRGB(0, 170, 255)
+local textColor = Color3.fromRGB(255, 255, 255)
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 500, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+mainFrame.BackgroundColor3 = darkColor
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = gui
+mainFrame.Visible = true
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Title Bar
+local titleBar = Instance.new("TextLabel")
+titleBar.Parent = mainFrame
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+titleBar.Text = "NatHub | Dead Rails (0.3.1)"
+titleBar.TextColor3 = textColor
+titleBar.Font = Enum.Font.SourceSansBold
+titleBar.TextSize = 16
+
+gui.IgnoreGuiInset = true
+
+-- Side Menu
+local sideMenu = Instance.new("Frame")
+sideMenu.Name = "SideMenu"
+sideMenu.Size = UDim2.new(0, 130, 1, -30)
+sideMenu.Position = UDim2.new(0, 0, 0, 30)
+sideMenu.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+sideMenu.Parent = mainFrame
+
+-- Tab Buttons
+local tabs = {"Main", "Character", "Teleport", "Visual", "Combat", "Configuration"}
+local tabFrames = {}
+local activeTab
+
+for i, tabName in ipairs(tabs) do
+    local tabBtn = Instance.new("TextButton")
+    tabBtn.Size = UDim2.new(1, 0, 0, 35)
+    tabBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 35)
+    tabBtn.Text = tabName
+    tabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    tabBtn.TextColor3 = textColor
+    tabBtn.Font = Enum.Font.SourceSansBold
+    tabBtn.TextSize = 14
+    tabBtn.Parent = sideMenu
+
+    local tabFrame = Instance.new("Frame")
+    tabFrame.Name = tabName .. "Frame"
+    tabFrame.Size = UDim2.new(1, -130, 1, -30)
+    tabFrame.Position = UDim2.new(0, 130, 0, 30)
+    tabFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    tabFrame.Visible = false
+    tabFrame.Parent = mainFrame
+
+    tabFrames[tabName] = tabFrame
+
+    tabBtn.MouseButton1Click:Connect(function()
+        if activeTab then
+            activeTab.Visible = false
+        end
+        tabFrame.Visible = true
+        activeTab = tabFrame
+    end)
 end
 
--- Janela Principal
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Name = "MainFrame"
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.Size = UDim2.new(0, 400, 0, 250)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
-MainFrame.Active = true
-MainFrame.Draggable = true
+-- Character Tab Content
+local charTab = tabFrames["Character"]
 
--- Barra lateral
-local Sidebar = Instance.new("Frame", MainFrame)
-Sidebar.Size = UDim2.new(0, 100, 1, 0)
-Sidebar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+local walkSpeedLabel = Instance.new("TextLabel")
+walkSpeedLabel.Text = "Walk Speed"
+walkSpeedLabel.Position = UDim2.new(0, 10, 0, 20)
+walkSpeedLabel.Size = UDim2.new(0, 200, 0, 25)
+walkSpeedLabel.BackgroundTransparency = 1
+walkSpeedLabel.TextColor3 = textColor
+walkSpeedLabel.Font = Enum.Font.SourceSans
+walkSpeedLabel.TextSize = 14
+walkSpeedLabel.Parent = charTab
 
--- Área de conteúdo
-local Content = Instance.new("Frame", MainFrame)
-Content.Size = UDim2.new(1, -100, 1, 0)
-Content.Position = UDim2.new(0, 100, 0, 0)
-Content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+local walkSpeedSlider = Instance.new("TextBox")
+walkSpeedSlider.Text = tostring(LocalPlayer.Character.Humanoid.WalkSpeed)
+walkSpeedSlider.Size = UDim2.new(0, 100, 0, 30)
+walkSpeedSlider.Position = UDim2.new(0, 10, 0, 50)
+walkSpeedSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+walkSpeedSlider.TextColor3 = textColor
+walkSpeedSlider.Font = Enum.Font.SourceSans
+walkSpeedSlider.TextSize = 14
+walkSpeedSlider.Parent = charTab
 
--- Botão Minimizar
-local Minimize = Instance.new("TextButton", MainFrame)
-Minimize.Text = "-"
-Minimize.Size = UDim2.new(0, 30, 0, 30)
-Minimize.Position = UDim2.new(1, -60, 0, 0)
-Minimize.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
-Minimize.Font = Enum.Font.SourceSansBold
-Minimize.TextSize = 18
-
--- Botão Fechar
-local Close = Instance.new("TextButton", MainFrame)
-Close.Text = "X"
-Close.Size = UDim2.new(0, 30, 0, 30)
-Close.Position = UDim2.new(1, -30, 0, 0)
-Close.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-Close.TextColor3 = Color3.fromRGB(255, 255, 255)
-Close.Font = Enum.Font.SourceSansBold
-Close.TextSize = 18
-
--- Botão Flutuante
-local FloatBtn = Instance.new("TextButton", ScreenGui)
-FloatBtn.Text = "NatHub"
-FloatBtn.Size = UDim2.new(0, 100, 0, 30)
-FloatBtn.Position = UDim2.new(0, 10, 0, 10)
-FloatBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-FloatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-FloatBtn.Font = Enum.Font.SourceSansBold
-FloatBtn.TextSize = 14
-FloatBtn.Visible = false
-FloatBtn.Draggable = true
-
--- Página Character
-local CharacterPage = Instance.new("Frame", Content)
-CharacterPage.Size = UDim2.new(1, 0, 1, 0)
-CharacterPage.Visible = false
-CharacterPage.BackgroundTransparency = 1
-
-local function CreateSlider(name, parent, min, max, default, posY, callback)
-	local label = Instance.new("TextLabel", parent)
-	label.Text = name
-	label.Position = UDim2.new(0, 10, 0, posY)
-	label.Size = UDim2.new(0, 200, 0, 20)
-	label.TextColor3 = Color3.fromRGB(255, 255, 255)
-	label.BackgroundTransparency = 1
-	label.TextSize = 14
-	label.Font = Enum.Font.SourceSans
-
-	local slider = Instance.new("TextBox", parent)
-	slider.Position = UDim2.new(0, 10, 0, posY + 20)
-	slider.Size = UDim2.new(0, 100, 0, 25)
-	slider.Text = tostring(default)
-	slider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	slider.TextColor3 = Color3.fromRGB(255, 255, 255)
-	slider.Font = Enum.Font.SourceSans
-	slider.TextSize = 14
-
-	slider.FocusLost:Connect(function()
-		local value = tonumber(slider.Text)
-		if value then
-			value = math.clamp(value, min, max)
-			callback(value)
-		end
-	end)
-end
-
--- WalkSpeed e JumpPower sliders
-CreateSlider("Walk Speed", CharacterPage, 16, 500, 16, 10, function(val)
-	pcall(function()
-		LocalPlayer.Character.Humanoid.WalkSpeed = val
-	end)
+walkSpeedSlider.FocusLost:Connect(function()
+    local val = tonumber(walkSpeedSlider.Text)
+    if val then
+        pcall(function()
+            LocalPlayer.Character.Humanoid.WalkSpeed = val
+        end)
+    end
 end)
 
-CreateSlider("Jump Power", CharacterPage, 50, 500, 50, 60, function(val)
-	pcall(function()
-		LocalPlayer.Character.Humanoid.JumpPower = val
-	end)
+local jumpPowerLabel = Instance.new("TextLabel")
+jumpPowerLabel.Text = "Jump Power"
+jumpPowerLabel.Position = UDim2.new(0, 10, 0, 90)
+jumpPowerLabel.Size = UDim2.new(0, 200, 0, 25)
+jumpPowerLabel.BackgroundTransparency = 1
+jumpPowerLabel.TextColor3 = textColor
+jumpPowerLabel.Font = Enum.Font.SourceSans
+jumpPowerLabel.TextSize = 14
+jumpPowerLabel.Parent = charTab
+
+local jumpPowerSlider = Instance.new("TextBox")
+jumpPowerSlider.Text = tostring(LocalPlayer.Character.Humanoid.JumpPower)
+jumpPowerSlider.Size = UDim2.new(0, 100, 0, 30)
+jumpPowerSlider.Position = UDim2.new(0, 10, 0, 120)
+jumpPowerSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+jumpPowerSlider.TextColor3 = textColor
+jumpPowerSlider.Font = Enum.Font.SourceSans
+jumpPowerSlider.TextSize = 14
+jumpPowerSlider.Parent = charTab
+
+jumpPowerSlider.FocusLost:Connect(function()
+    local val = tonumber(jumpPowerSlider.Text)
+    if val then
+        pcall(function()
+            LocalPlayer.Character.Humanoid.JumpPower = val
+        end)
+    end
 end)
 
--- Botões laterais
-local pages = {
-	Main = Instance.new("Frame", Content),
-	Character = CharacterPage,
-	Teleport = Instance.new("Frame", Content),
-	Visual = Instance.new("Frame", Content),
-	Combat = Instance.new("Frame", Content),
-	Configuration = Instance.new("Frame", Content)
-}
+-- Floating button
+local floatBtn = Instance.new("TextButton")
+floatBtn.Parent = gui
+floatBtn.Text = "NatHub"
+floatBtn.Size = UDim2.new(0, 120, 0, 40)
+floatBtn.Position = UDim2.new(0, 10, 0, 10)
+floatBtn.BackgroundColor3 = accentColor
+floatBtn.TextColor3 = textColor
+floatBtn.Font = Enum.Font.SourceSansBold
+floatBtn.TextSize = 16
+floatBtn.Visible = false
+floatBtn.Active = true
+floatBtn.Draggable = true
 
-for _, frame in pairs(pages) do
-	frame.Size = UDim2.new(1, 0, 1, 0)
-	frame.Visible = false
-	frame.BackgroundTransparency = 1
-end
+-- Minimize & Close
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = mainFrame
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeBtn.TextColor3 = textColor
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 18
 
-local y = 0
-for name, page in pairs(pages) do
-	local btn = CreateSideButton(name, Sidebar, y)
-	y = y + 35
+local minBtn = Instance.new("TextButton")
+minBtn.Parent = mainFrame
+minBtn.Text = "-"
+minBtn.Size = UDim2.new(0, 30, 0, 30)
+minBtn.Position = UDim2.new(1, -60, 0, 0)
+minBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+minBtn.TextColor3 = textColor
+minBtn.Font = Enum.Font.SourceSansBold
+minBtn.TextSize = 18
 
-	btn.MouseButton1Click:Connect(function()
-		for _, f in pairs(pages) do
-			f.Visible = false
-		end
-		page.Visible = true
-	end)
-end
-
-pages.Main.Visible = true -- Mostrar Main como padrão
-
--- Eventos dos botões
-Minimize.MouseButton1Click:Connect(function()
-	MainFrame.Visible = false
-	FloatBtn.Visible = true
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
 end)
 
-FloatBtn.MouseButton1Click:Connect(function()
-	MainFrame.Visible = true
-	FloatBtn.Visible = false
+minBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    floatBtn.Visible = true
 end)
 
-Close.MouseButton1Click:Connect(function()
-	ScreenGui:Destroy()
+floatBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    floatBtn.Visible = false
 end)
+
+-- Abrir aba "Character" como padrão
+wait()
+tabFrames["Character"].Visible = true
+activeTab = tabFrames["Character"]
