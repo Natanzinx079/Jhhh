@@ -152,6 +152,58 @@ createInputBox(LocalPlayer.Character.Humanoid.JumpPower, 120, function(val)
     LocalPlayer.Character.Humanoid.JumpPower = val
 end)
 
+-- Conteúdo do Visual (NatanHub com visual aprimorado)
+local visualTab = tabFrames["Visual"]
+
+local function createToggle(text, posY, callback)
+    local toggle = Instance.new("TextButton")
+    toggle.Text = text
+    toggle.Size = UDim2.new(0, 200, 0, 30)
+    toggle.Position = UDim2.new(0, 10, 0, posY)
+    toggle.BackgroundColor3 = highlightColor
+    toggle.TextColor3 = textColor
+    toggle.Font = Enum.Font.Gotham
+    toggle.TextSize = 14
+    toggle.Parent = visualTab
+
+    local corner = Instance.new("UICorner", toggle)
+    corner.CornerRadius = UDim.new(0, 6)
+
+    local isActive = false
+    toggle.MouseButton1Click:Connect(function()
+        isActive = not isActive
+        toggle.BackgroundColor3 = isActive and accentColor or highlightColor
+        pcall(callback, isActive)
+    end)
+
+    return toggle
+end
+
+-- Funções ESP e outros recursos visuais
+createToggle("Esp Item", 20, function(active)
+    if active then
+        -- Código para ativar ESP Item
+    else
+        -- Código para desativar ESP Item
+    end
+end)
+
+createToggle("Esp Train", 60, function(active)
+    if active then
+        -- Código para ativar ESP Train
+    else
+        -- Código para desativar ESP Train
+    end
+end)
+
+createToggle("Unlock Mouse", 100, function(active)
+    if active then
+        -- Código para desbloquear o mouse
+    else
+        -- Código para bloquear o mouse novamente
+    end
+end)
+
 -- Botão flutuante
 local floatBtn = Instance.new("TextButton")
 floatBtn.Parent = gui
