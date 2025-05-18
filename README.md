@@ -152,8 +152,46 @@ createInputBox(LocalPlayer.Character.Humanoid.JumpPower, 120, function(val)
     LocalPlayer.Character.Humanoid.JumpPower = val
 end)
 
--- Conteúdo do Visual (NatanHub com visual aprimorado)
-local visualTab = tabFrames["Visual"]
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "NatanHub"
+gui.Parent = game.CoreGui
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+
+-- Cores
+local darkColor = Color3.fromRGB(25, 25, 25)
+local accentColor = Color3.fromRGB(0, 170, 255)
+local textColor = Color3.fromRGB(255, 255, 255)
+local highlightColor = Color3.fromRGB(35, 35, 35)
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 520, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -260, 0.5, -160)
+mainFrame.BackgroundColor3 = darkColor
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = gui
+mainFrame.Visible = true
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.ClipsDescendants = true
+mainFrame:SetAttribute("Rounded", true)
+
+local UICornerMain = Instance.new("UICorner", mainFrame)
+UICornerMain.CornerRadius = UDim.new(0, 10)
+
+-- Aba Visual
+local visualTab = Instance.new("Frame")
+visualTab.Name = "VisualTab"
+visualTab.Size = UDim2.new(1, -130, 1, -32)
+visualTab.Position = UDim2.new(0, 130, 0, 32)
+visualTab.BackgroundColor3 = darkColor
+visualTab.Parent = mainFrame
 
 local function createToggle(text, posY, callback)
     local toggle = Instance.new("TextButton")
@@ -179,29 +217,37 @@ local function createToggle(text, posY, callback)
     return toggle
 end
 
--- Funções ESP e outros recursos visuais
-createToggle("Esp Item", 20, function(active)
-    if active then
-        -- Código para ativar ESP Item
-    else
-        -- Código para desativar ESP Item
+-- Funções ESP
+local function espToggle(targetName, active)
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj:FindFirstChild("HumanoidRootPart") and obj.Name == targetName then
+            if active then
+                local esp = Instance.new("Highlight")
+                esp.Parent = obj
+                esp.FillColor = Color3.fromRGB(0, 170, 255)
+                esp.FillTransparency esp.OutlineTransparency = 0
+            else
+                for _, v in pairs(obj:GetChildren()) do
+                    if v:IsA("Highlight") then
+                        v:Destroy()
+                    end
+                end
+            end
+        end
     end
+end
+
+createToggle("Esp Item", 20, function(active)
+    espToggle("ItemName", active)
 end)
 
 createToggle("Esp Train", 60, function(active)
-    if active then
-        -- Código para ativar ESP Train
-    else
-        -- Código para desativar ESP Train
-    end
+    espToggle("TrainName", active)
 end)
 
+-- Função Unlock Mouse
 createToggle("Unlock Mouse", 100, function(active)
-    if active then
-        -- Código para desbloquear o mouse
-    else
-        -- Código para bloquear o mouse novamente
-    end
+    UserInputService.MouseBehavior = active and Enum.MouseBehavior.Default or Enum.MouseBehavior.LockCenter
 end)
 
 -- Botão flutuante
