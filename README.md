@@ -1,138 +1,152 @@
--- // GUI Principal
-local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))
-ScreenGui.Name = "NatHub"
+--// Criar a UI principal
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Sidebar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CloseBtn = Instance.new("TextButton")
+local MinimizeBtn = Instance.new("TextButton")
+local Tabs = {}
+local Contents = {}
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
 
--- // Janela
-local mainFrame = Instance.new("Frame", ScreenGui)
-mainFrame.Size = UDim2.new(0, 500, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Draggable = true
+ScreenGui.Name = "NatHub_Style"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.CoreGui
 
--- // TopBar
-local topBar = Instance.new("Frame", mainFrame)
-topBar.Size = UDim2.new(1, 0, 0, 25)
-topBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-topBar.BorderSizePixel = 0
+MainFrame.Size = UDim2.new(0, 500, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
 
--- // Botão Minimizar
-local minimizeBtn = Instance.new("TextButton", topBar)
-minimizeBtn.Size = UDim2.new(0, 25, 0, 25)
-minimizeBtn.Position = UDim2.new(1, -50, 0, 0)
-minimizeBtn.Text = "-"
-minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-minimizeBtn.BorderSizePixel = 0
+Sidebar.Size = UDim2.new(0, 130, 1, 0)
+Sidebar.Position = UDim2.new(0, 0, 0, 0)
+Sidebar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Sidebar.Parent = MainFrame
 
--- // Botão Fechar
-local closeBtn = Instance.new("TextButton", topBar)
-closeBtn.Size = UDim2.new(0, 25, 0, 25)
-closeBtn.Position = UDim2.new(1, -25, 0, 0)
-closeBtn.Text = "X"
-closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
-closeBtn.BorderSizePixel = 0
+Title.Text = "NatHub"
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+Title.Parent = Sidebar
 
--- // Menu Lateral
-local sideBar = Instance.new("Frame", mainFrame)
-sideBar.Size = UDim2.new(0, 130, 1, -25)
-sideBar.Position = UDim2.new(0, 0, 0, 25)
-sideBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-sideBar.BorderSizePixel = 0
+CloseBtn.Text = "X"
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+CloseBtn.Font = Enum.Font.SourceSans
+CloseBtn.TextSize = 18
+CloseBtn.Parent = MainFrame
 
--- // Conteúdo
-local contentFrame = Instance.new("Frame", mainFrame)
-contentFrame.Size = UDim2.new(1, -130, 1, -25)
-contentFrame.Position = UDim2.new(0, 130, 0, 25)
-contentFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-contentFrame.BorderSizePixel = 0
+MinimizeBtn.Text = "-"
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -60, 0, 0)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+MinimizeBtn.TextColor3 = Color3.new(1, 1, 1)
+MinimizeBtn.Font = Enum.Font.SourceSans
+MinimizeBtn.TextSize = 18
+MinimizeBtn.Parent = MainFrame
 
--- // Função para criar abas
-local tabs = {}
+-- Função para criar abas
 local function createTab(name)
-	local button = Instance.new("TextButton", sideBar)
-	button.Size = UDim2.new(1, 0, 0, 35)
-	button.Text = name
-	button.TextColor3 = Color3.fromRGB(255, 255, 255)
-	button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-	button.BorderSizePixel = 0
+    local button = Instance.new("TextButton")
+    button.Text = name
+    button.Size = UDim2.new(1, 0, 0, 30)
+    button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.SourceSans
+    button.TextSize = 18
+    button.Parent = Sidebar
 
-	local page = Instance.new("Frame", contentFrame)
-	page.Size = UDim2.new(1, 0, 1, 0)
-	page.Visible = false
-	page.BackgroundTransparency = 1
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, -130, 1, -30)
+    content.Position = UDim2.new(0, 130, 0, 30)
+    content.BackgroundTransparency = 1
+    content.Visible = false
+    content.Parent = MainFrame
 
-	button.MouseButton1Click:Connect(function()
-		for _, tab in pairs(tabs) do
-			tab.page.Visible = false
-			tab.button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-		end
-		page.Visible = true
-		button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-	end)
+    table.insert(Tabs, button)
+    table.insert(Contents, content)
 
-	table.insert(tabs, {button = button, page = page})
-	return page
+    button.MouseButton1Click:Connect(function()
+        for i = 1, #Contents do
+            Contents[i].Visible = false
+        end
+        content.Visible = true
+    end)
+
+    return content
 end
 
--- // Criar páginas
-local mainPage = createTab("Main")
-local characterPage = createTab("Character")
-createTab("Teleport")
-createTab("Visual")
-createTab("Combat")
-createTab("Configuration")
+-- Cria a aba "Main"
+local mainContent = createTab("Main")
 
--- // Ativar primeira aba por padrão
-tabs[1].button:FireMouseButton1Click()
+local function createSlider(parent, labelText, minVal, maxVal, defaultVal, callback)
+    local label = Instance.new("TextLabel")
+    label.Text = labelText
+    label.Size = UDim2.new(0, 100, 0, 30)
+    label.Position = UDim2.new(0, 10, 0, (#parent:GetChildren() * 35))
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.Font = Enum.Font.SourceSans
+    label.TextSize = 18
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = parent
 
--- // Funções para sliders (Character)
-local function createSlider(parent, labelText, minVal, maxVal, default, callback)
-	local label = Instance.new("TextLabel", parent)
-	label.Size = UDim2.new(1, -20, 0, 25)
-	label.Position = UDim2.new(0, 10, 0, (#parent:GetChildren() - 1) * 35)
-	label.Text = labelText
-	label.TextColor3 = Color3.fromRGB(255, 255, 255)
-	label.BackgroundTransparency = 1
-	label.TextXAlignment = Enum.TextXAlignment.Left
+    local textbox = Instance.new("TextBox")
+    textbox.Text = tostring(defaultVal)
+    textbox.Size = UDim2.new(0, 100, 0, 30)
+    textbox.Position = UDim2.new(0, 120, 0, (#parent:GetChildren() - 1) * 35)
+    textbox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    textbox.TextColor3 = Color3.new(1, 1, 1)
+    textbox.Font = Enum.Font.SourceSans
+    textbox.TextSize = 18
+    textbox.ClearTextOnFocus = false
+    textbox.Parent = parent
 
-	local box = Instance.new("TextBox", parent)
-	box.Size = UDim2.new(0, 60, 0, 25)
-	box.Position = UDim2.new(1, -70, 0, (#parent:GetChildren() - 1) * 35)
-	box.Text = tostring(default)
-	box.TextColor3 = Color3.fromRGB(255, 255, 255)
-	box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	box.BorderSizePixel = 0
-
-	box.FocusLost:Connect(function()
-		local num = tonumber(box.Text)
-		if num then
-			num = math.clamp(num, minVal, maxVal)
-			callback(num)
-		end
-	end)
+    textbox.FocusLost:Connect(function()
+        local value = tonumber(textbox.Text)
+        if value then
+            value = math.clamp(value, minVal, maxVal)
+            textbox.Text = tostring(value)
+            callback(value)
+        else
+            textbox.Text = tostring(defaultVal)
+        end
+    end)
 end
 
--- // Sliders funcionais
-createSlider(characterPage, "Walk Speed", 1, 200, 16, function(val)
-	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = val
+createSlider(mainContent, "Walk Speed", 1, 200, 16, function(val)
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = val
+    end
 end)
 
-createSlider(characterPage, "Jump Power", 1, 200, 50, function(val)
-	game.Players.LocalPlayer.Character.Humanoid.JumpPower = val
+createSlider(mainContent, "Jump Power", 1, 300, 50, function(val)
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.JumpPower = val
+    end
 end)
 
--- // Botão Fechar
-closeBtn.MouseButton1Click:Connect(function()
-	mainFrame.Visible = false
+-- Inicializa primeira aba como visível
+Contents[1].Visible = true
+
+-- Botões fechar e minimizar
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
 end)
 
--- // Botão Minimizar
-local minimized = false
-minimizeBtn.MouseButton1Click:Connect(function()
-	minimized = not minimized
-	contentFrame.Visible = not minimized
-	sideBar.Visible = not minimized
+MinimizeBtn.MouseButton1Click:Connect(function()
+    for i, content in pairs(Contents) do
+        content.Visible = false
+    end
+    Sidebar.Visible = not Sidebar.Visible
 end)
