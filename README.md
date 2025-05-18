@@ -90,29 +90,33 @@ JumpPowerBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 JumpPowerBox.Font = Enum.Font.SourceSans
 JumpPowerBox.TextSize = 14
 
--- Botão Flutuante (só aparece ao minimizar)
-local FloatBtn = Instance.new("TextButton")
-FloatBtn.Parent = ScreenGui
-FloatBtn.Text = "NatanHub"
-FloatBtn.Size = UDim2.new(0, 100, 0, 30)
-FloatBtn.Position = UDim2.new(0, 10, 0, 10)
-FloatBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-FloatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-FloatBtn.Font = Enum.Font.SourceSansBold
-FloatBtn.TextSize = 14
-FloatBtn.Visible = false
-FloatBtn.Active = true
-FloatBtn.Draggable = true
+-- Menu Lateral Flutuante ao Minimizar
+local SideMenu = Instance.new("Frame")
+SideMenu.Name = "SideMenu"
+SideMenu.Parent = ScreenGui
+SideMenu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SideMenu.Position = UDim2.new(0, 10, 0.5, -25)
+SideMenu.Size = UDim2.new(0, 100, 0, 50)
+SideMenu.Visible = false
+
+local SideOpen = Instance.new("TextButton")
+SideOpen.Parent = SideMenu
+SideOpen.Size = UDim2.new(1, 0, 1, 0)
+SideOpen.Text = "Abrir Hub"
+SideOpen.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SideOpen.TextColor3 = Color3.fromRGB(255, 255, 255)
+SideOpen.Font = Enum.Font.SourceSansBold
+SideOpen.TextSize = 14
 
 -- Ações dos botões
 Minimize.MouseButton1Click:Connect(function()
 	Main.Visible = false
-	FloatBtn.Visible = true
+	SideMenu.Visible = true
 end)
 
-FloatBtn.MouseButton1Click:Connect(function()
+SideOpen.MouseButton1Click:Connect(function()
 	Main.Visible = true
-	FloatBtn.Visible = false
+	SideMenu.Visible = false
 end)
 
 Close.MouseButton1Click:Connect(function()
