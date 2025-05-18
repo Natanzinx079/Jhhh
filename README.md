@@ -1,107 +1,122 @@
--- Criação do GUI principal
-local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))
-ScreenGui.Name = "NatHubRemastered"
+-- NatHub Remake 0.3.1 | Compatível com Delta Mobile
+local CoreGui = game:GetService("CoreGui")
+local Player = game.Players.LocalPlayer
+local Char = Player.Character or Player.CharacterAdded:Wait()
+
+-- Criar ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "NatHubUI"
+gui.ResetOnSpawn = false
+gui.Parent = CoreGui
 
 -- Janela principal
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 400, 0, 250)
-MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.Draggable = true
-
--- Borda arredondada
-local UICorner = Instance.new("UICorner", MainFrame)
-UICorner.CornerRadius = UDim.new(0, 6)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 450, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = gui
 
 -- Título
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, -50, 0, 30)
-Title.Position = UDim2.new(0, 10, 0, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "NatHub | Dead Rails (0.3.1)"
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.Font = Enum.Font.Gotham
-Title.TextSize = 14
-Title.TextXAlignment = Enum.TextXAlignment.Left
+local titleBar = Instance.new("TextLabel")
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+titleBar.Text = "  NatHub | Dead Rails (0.3.1)"
+titleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleBar.TextXAlignment = Enum.TextXAlignment.Left
+titleBar.Font = Enum.Font.GothamBold
+titleBar.TextSize = 14
+titleBar.Parent = mainFrame
 
--- Botão de fechar (X)
-local CloseBtn = Instance.new("TextButton", MainFrame)
-CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-CloseBtn.Position = UDim2.new(1, -30, 0, 0)
-CloseBtn.Text = "X"
-CloseBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-CloseBtn.TextColor3 = Color3.new(1, 0.5, 0.5)
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.TextSize = 14
+-- Botões de controle (fechar e ocultar)
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Parent = mainFrame
 
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+minimizeBtn.Position = UDim2.new(1, -60, 0, 0)
+minimizeBtn.Text = "-"
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+minimizeBtn.BackgroundTransparency = 1
+minimizeBtn.Parent = mainFrame
+
+-- Menu lateral
+local sideMenu = Instance.new("Frame")
+sideMenu.Size = UDim2.new(0, 120, 1, -30)
+sideMenu.Position = UDim2.new(0, 0, 0, 30)
+sideMenu.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+sideMenu.Parent = mainFrame
+
+-- Conteúdo da aba
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, -120, 1, -30)
+contentFrame.Position = UDim2.new(0, 120, 0, 30)
+contentFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+contentFrame.Parent = mainFrame
+
+-- Função para criar botão de aba
+local currentTab
+local function createTab(name, callback)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 0, 30)
+    button.Text = name
+    button.Font = Enum.Font.Gotham
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundTransparency = 1
+    button.Parent = sideMenu
+    button.MouseButton1Click:Connect(function()
+        if currentTab then currentTab:Destroy() end
+        currentTab = Instance.new("Frame", contentFrame)
+        currentTab.Size = UDim2.new(1, 0, 1, 0)
+        currentTab.BackgroundTransparency = 1
+        callback(currentTab)
+    end)
+end
+
+-- Criação das abas e funções
+createTab("Character", function(tab)
+    local speedLabel = Instance.new("TextLabel", tab)
+    speedLabel.Size = UDim2.new(1, -20, 0, 30)
+    speedLabel.Position = UDim2.new(0, 10, 0, 10)
+    speedLabel.Text = "Walk Speed: " .. Char.Humanoid.WalkSpeed
+    speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    speedLabel.BackgroundTransparency = 1
+    speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local jumpLabel = Instance.new("TextLabel", tab)
+    jumpLabel.Size = UDim2.new(1, -20, 0, 30)
+    jumpLabel.Position = UDim2.new(0, 10, 0, 50)
+    jumpLabel.Text = "Jump Power: " .. Char.Humanoid.JumpPower
+    jumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    jumpLabel.BackgroundTransparency = 1
+    jumpLabel.TextXAlignment = Enum.TextXAlignment.Left
 end)
 
--- Botão de minimizar (-)
-local MinBtn = Instance.new("TextButton", MainFrame)
-MinBtn.Size = UDim2.new(0, 30, 0, 30)
-MinBtn.Position = UDim2.new(1, -60, 0, 0)
-MinBtn.Text = "-"
-MinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-MinBtn.TextColor3 = Color3.new(1, 1, 0.5)
-MinBtn.Font = Enum.Font.GothamBold
-MinBtn.TextSize = 14
-
-local Minimized = false
-MinBtn.MouseButton1Click:Connect(function()
-    Minimized = not Minimized
-    for _, v in pairs(MainFrame:GetChildren()) do
-        if v:IsA("Frame") or v:IsA("TextButton") or v:IsA("TextLabel") then
-            if v ~= Title and v ~= CloseBtn and v ~= MinBtn then
-                v.Visible = not Minimized
-            end
-        end
-    end
+createTab("Main", function(tab)
+    local label = Instance.new("TextLabel", tab)
+    label.Text = "Main Tab – em desenvolvimento..."
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.Position = UDim2.new(0, 10, 0, 10)
+    label.Size = UDim2.new(1, -20, 0, 30)
 end)
 
--- Container das opções
-local OptionsFrame = Instance.new("Frame", MainFrame)
-OptionsFrame.Size = UDim2.new(1, -20, 1, -40)
-OptionsFrame.Position = UDim2.new(0, 10, 0, 40)
-OptionsFrame.BackgroundTransparency = 1
-
--- WalkSpeed Slider
-local WalkSpeedSlider = Instance.new("TextButton", OptionsFrame)
-WalkSpeedSlider.Size = UDim2.new(1, 0, 0, 40)
-WalkSpeedSlider.Position = UDim2.new(0, 0, 0, 0)
-WalkSpeedSlider.Text = "Walk Speed: 16"
-WalkSpeedSlider.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-WalkSpeedSlider.TextColor3 = Color3.new(1, 1, 1)
-WalkSpeedSlider.Font = Enum.Font.Gotham
-WalkSpeedSlider.TextSize = 14
-
-local WalkSpeed = 16
-WalkSpeedSlider.MouseButton1Click:Connect(function()
-    WalkSpeed = WalkSpeed + 10
-    if WalkSpeed > 200 then WalkSpeed = 16 end
-    WalkSpeedSlider.Text = "Walk Speed: " .. WalkSpeed
-    local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.WalkSpeed = WalkSpeed end
+-- Fechar a UI
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
 end)
 
--- JumpPower Slider
-local JumpPowerSlider = Instance.new("TextButton", OptionsFrame)
-JumpPowerSlider.Size = UDim2.new(1, 0, 0, 40)
-JumpPowerSlider.Position = UDim2.new(0, 0, 0, 50)
-JumpPowerSlider.Text = "Jump Power: 50"
-JumpPowerSlider.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-JumpPowerSlider.TextColor3 = Color3.new(1, 1, 1)
-JumpPowerSlider.Font = Enum.Font.Gotham
-JumpPowerSlider.TextSize = 14
-
-local JumpPower = 50
-JumpPowerSlider.MouseButton1Click:Connect(function()
-    JumpPower = JumpPower + 25
-    if JumpPower > 300 then JumpPower = 50 end
-    JumpPowerSlider.Text = "Jump Power: " .. JumpPower
-    local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.JumpPower = JumpPower end
+-- Ocultar/mostrar conteúdo
+local isMinimized = false
+minimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    sideMenu.Visible = not isMinimized
+    contentFrame.Visible = not isMinimized
 end)
