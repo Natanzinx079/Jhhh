@@ -1,8 +1,7 @@
--- NatHub 0.3.1 Remastered (com novas funções)
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/natxhub/nathubui/main/ui.lua"))()
 local hub = library:CreateWindow("NatHub | Dead Rails (0.3.1)", "by NataX | .gg/nathub")
 
--- Abas
+-- Tabs
 local main = hub:AddTab("Main", "Settings and automation")
 local character = hub:AddTab("Character", "Movement cheats")
 local teleport = hub:AddTab("Teleport", "Area teleporters")
@@ -12,13 +11,15 @@ local config = hub:AddTab("Configuration", "UI & hotkeys")
 
 -- Main
 main:AddButton("Auto Collect Gold", function()
-    while task.wait(0.5) do
-        for _, gold in pairs(game:GetService("Workspace").Gold:GetChildren()) do
-            if gold:IsA("Part") then
-                gold.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+    spawn(function()
+        while task.wait(0.5) do
+            for _, gold in pairs(workspace.Gold:GetChildren()) do
+                if gold:IsA("Part") then
+                    gold.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                end
             end
         end
-    end
+    end)
 end)
 
 main:AddButton("Reset Position", function()
@@ -34,31 +35,39 @@ character:AddSlider("Jump Power", 50, 500, function(value)
     game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
 end)
 
+local infiniteJumpConn
 character:AddToggle("Infinite Jump", false, function(enabled)
-    game:GetService("UserInputService").JumpRequest:Connect(function()
-        if enabled then
+    if infiniteJumpConn then infiniteJumpConn:Disconnect() end
+    if enabled then
+        infiniteJumpConn = game:GetService("UserInputService").JumpRequest:Connect(function()
             game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+        end)
+    end
+end)
+
+-- Combat
+local autoKill = false
+combat:AddToggle("Auto Kill", false, function(state)
+    autoKill = state
+    spawn(function()
+        while autoKill do
+            task.wait(0.2)
+            for _, enemy in pairs(workspace.Enemies:GetChildren()) do
+                if enemy:FindFirstChild("Humanoid") then
+                    enemy.Humanoid.Health = 0
+                end
+            end
         end
     end)
 end)
 
--- Combat
-combat:AddToggle("Auto Kill", false, function(enabled)
-    while enabled do
-        task.wait(0.1)
-        for _, enemy in pairs(workspace.Enemies:GetChildren()) do
-            if enemy:FindFirstChild("Humanoid") then
-                enemy.Humanoid.Health = 0
-            end
-        end
-    end
-end)
-
+local oneHitConn
 combat:AddToggle("One Hit Kill", false, function(enabled)
+    if oneHitConn then oneHitConn:Disconnect() end
     if enabled then
         for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
             if tool:IsA("Tool") and tool:FindFirstChild("Handle") then
-                tool.Handle.Touched:Connect(function(hit)
+                oneHitConn = tool.Handle.Touched:Connect(function(hit)
                     local hum = hit.Parent:FindFirstChild("Humanoid")
                     if hum then hum.Health = 0 end
                 end)
@@ -69,12 +78,12 @@ end)
 
 combat:AddToggle("God Mode", false, function(enabled)
     if enabled then
-        local char = game.Players.LocalPlayer.Character
-        char:FindFirstChild("Humanoid").Name = "God"
+        local hum = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+        if hum then hum.Name = "God" end
     end
 end)
 
--- Teleport (mantido igual ao original)
+-- Teleport
 teleport:AddButton("Tp To Tesla", function()
     game.Players.LocalPlayer.Character:MoveTo(Vector3.new(350, 10, -280))
 end)
@@ -93,12 +102,14 @@ teleport:AddButton("Teleport", function()
         ["Base 2"] = Vector3.new(50, 10, 50),
         ["Base 3"] = Vector3.new(100, 10, 100)
     }
-    game.Players.LocalPlayer.Character:MoveTo(positions[_G.SelectedBase])
+    if _G.SelectedBase and positions[_G.SelectedBase] then
+        game.Players.LocalPlayer.Character:MoveTo(positions[_G.SelectedBase])
+    end
 end)
 
 -- Visual
 visual:AddToggle("ESP", false, function(state)
-    -- Seu sistema ESP aqui
+    -- Adicione seu sistema ESP compatível aqui
 end)
 
 visual:AddToggle("Highlight Items", false, function(state)
@@ -106,11 +117,7 @@ visual:AddToggle("Highlight Items", false, function(state)
 end)
 
 visual:AddToggle("No Fog", false, function(state)
-    if state then
-        game:GetService("Lighting").FogEnd = 1e10
-    else
-        game:GetService("Lighting").FogEnd = 1000
-    end
+    game:GetService("Lighting").FogEnd = state and 1e10 or 1000
 end)
 
 visual:AddToggle("Theme Switch", false, function(state)
