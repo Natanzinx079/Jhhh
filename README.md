@@ -179,10 +179,10 @@ local function createToggle(text, posY, callback)
     return toggle
 end
 
--- Funções ESP
+-- Funções ESP adaptadas para Dead Rails
 local function espToggle(targetName, active)
     for _, obj in pairs(workspace:GetChildren()) do
-        if obj:IsA("Model") and obj:FindFirstChild("HumanoidRootPart") and obj.Name == targetName then
+        if obj:IsA("Model") and obj:FindFirstChild("HumanoidRootPart") and obj.Name:match(targetName) then
             if active then
                 local esp = Instance.new("Highlight")
                 esp.Parent = obj
@@ -200,15 +200,15 @@ local function espToggle(targetName, active)
     end
 end
 
-createToggle("Esp Item", 20, function(active)
-    espToggle("ItemName", active)
+createToggle("ESP Item", 20, function(active)
+    espToggle("Item", active) -- Adaptação para detectar itens em Dead Rails
 end)
 
-createToggle("Esp Train", 60, function(active)
-    espToggle("TrainName", active)
+createToggle("ESP Train", 60, function(active)
+    espToggle("Train", active) -- Adaptação para destacar trens no jogo
 end)
 
--- Função Mouse Lock
+-- Função Mouse Lock ajustada para Dead Rails
 local UserInputService = game:GetService("UserInputService")
 
 createToggle("Mouse Lock", 100, function(active)
